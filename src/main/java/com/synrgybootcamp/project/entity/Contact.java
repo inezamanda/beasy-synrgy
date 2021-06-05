@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Builder
@@ -36,4 +37,7 @@ public class Contact {
     @JoinColumn(name = "bank_id", referencedColumnName = "id")
     private Bank bank;
 
+    @OneToMany
+    @JoinColumn(name = "contact_id")
+    private List<Transaction> transactions;
 }

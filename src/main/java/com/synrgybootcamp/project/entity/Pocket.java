@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Builder
@@ -31,10 +32,17 @@ public class Pocket {
     @Column(name = "target")
     private Integer target;
 
+    @Column(name = "balance")
+    private Integer balance;
+
     @Column(name = "is_primary")
     private Boolean primary;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
+    @OneToMany
+    @JoinColumn(name = "pocket_id")
+    private List<PocketTransaction> pocketTransactions;
 }

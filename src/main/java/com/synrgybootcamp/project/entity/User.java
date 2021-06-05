@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
 @Data
@@ -52,6 +53,26 @@ public class User {
 
     @Column(name = "verif_code_status")
     private Boolean verifCodeStatus;
+
+    @OneToMany
+    @JoinColumn(name = "user_id")
+    private List<Contact> contacts;
+
+    @OneToMany
+    @JoinColumn(name = "user_id")
+    private List<Pocket> pockets;
+
+    @OneToMany
+    @JoinColumn(name = "user_id")
+    private List<PocketTransaction> pocketTransactions;
+
+    @OneToMany
+    @JoinColumn(name = "user_id")
+    private List<Transaction> transactions;
+
+    @OneToMany
+    @JoinColumn(name = "user_id")
+    private List<Transfer> transfers;
 
     @Override
     public boolean equals(Object o) {
