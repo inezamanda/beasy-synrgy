@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
 @Data
@@ -28,6 +29,10 @@ public class Bank {
 
     @Column(name = "is_primary")
     private Boolean primary;
+
+    @OneToMany
+    @JoinColumn(name = "bank_id")
+    List<Contact> contacts;
 
     @Override
     public boolean equals(Object o) {
