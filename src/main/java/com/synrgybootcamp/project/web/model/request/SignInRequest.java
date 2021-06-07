@@ -1,4 +1,4 @@
-package com.synrgybootcamp.project.web.model.response;
+package com.synrgybootcamp.project.web.model.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExampleResponse {
-    String example;
-    String user_id;
+public class SignInRequest {
+    private String email;
+    private String password;
 }
