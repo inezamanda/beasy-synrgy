@@ -9,6 +9,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Data
 @Builder
@@ -53,6 +54,12 @@ public class User {
 
     @Column(name = "verif_code_status")
     private Boolean verifCodeStatus;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "ID"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "ID"))
+    private Set<Role> roles;
 
     @OneToMany
     @JoinColumn(name = "user_id")
