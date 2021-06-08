@@ -1,8 +1,10 @@
 package com.synrgybootcamp.project.service.impl;
 
+import com.synrgybootcamp.project.entity.Pocket;
 import com.synrgybootcamp.project.entity.Role;
 import com.synrgybootcamp.project.entity.User;
 import com.synrgybootcamp.project.enums.RoleName;
+import com.synrgybootcamp.project.repository.PocketRepository;
 import com.synrgybootcamp.project.repository.RoleRepository;
 import com.synrgybootcamp.project.repository.UserRepository;
 import com.synrgybootcamp.project.security.model.UserDetailsImpl;
@@ -29,6 +31,9 @@ import java.util.stream.Collectors;
 public class AuthServiceImpl implements AuthService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PocketRepository pocketRepository;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -84,7 +89,7 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
-        return userRepository.save(
+        User userResult = userRepository.save(
                 User
                         .builder()
                         .email(signUpRequest.getEmail())
@@ -97,5 +102,18 @@ public class AuthServiceImpl implements AuthService {
                         .roles(roles)
                         .build()
         );
+
+        pocketRepository.save(
+                Pocket.builder()
+                        .user(userResult)
+                        .name("Primary Pocket " + signUpRequest.getFullName())
+                        .balance(userResult.getBalance())
+                        .picture(null)
+                        .primary(true)
+                        .target(0)
+                        .build()
+        );
+
+        return userResult;
     }
 }
