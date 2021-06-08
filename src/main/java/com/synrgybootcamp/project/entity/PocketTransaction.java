@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -27,6 +28,7 @@ public class PocketTransaction {
     private Integer amount;
 
     @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     @Column(name = "date")
     private Date date;
 
