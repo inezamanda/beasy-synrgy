@@ -1,9 +1,9 @@
 package com.synrgybootcamp.project.service;
 
 import com.synrgybootcamp.project.web.model.response.BankResponse;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface BankService {
-    Page<BankResponse> getAllBanks(Pageable Page);
+    List<BankResponse> getAllBanks();
 }

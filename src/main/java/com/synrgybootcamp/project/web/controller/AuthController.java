@@ -4,16 +4,15 @@ import com.synrgybootcamp.project.entity.User;
 import com.synrgybootcamp.project.service.impl.AuthServiceImpl;
 import com.synrgybootcamp.project.util.ApiResponse;
 import com.synrgybootcamp.project.util.ErrorResponse;
+import com.synrgybootcamp.project.web.model.request.ChangePasswordRequest;
+import com.synrgybootcamp.project.web.model.request.ForgotPasswordRequest;
 import com.synrgybootcamp.project.web.model.request.SignInRequest;
 import com.synrgybootcamp.project.web.model.request.SignUpRequest;
 import com.synrgybootcamp.project.web.model.response.SignInResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/auth")
@@ -49,5 +48,25 @@ public class AuthController {
                     , HttpStatus.OK
             );
         }
+    }
+
+    @PostMapping("forgot-password")
+    public ResponseEntity<Object> forgotPassword(
+            @RequestBody ForgotPasswordRequest forgotPasswordRequest
+    ) {
+        return new ResponseEntity<>(
+                new ApiResponse(authService.forgotPassword(forgotPasswordRequest))
+        , HttpStatus.OK);
+    }
+
+    @PostMapping("change-password/{token}")
+    public ResponseEntity<Object> changePassword(
+            @PathVariable String token,
+            @RequestBody ChangePasswordRequest changePasswordRequest
+    ) {
+        authService.changePassword(changePasswordRequest, token);
+        return new ResponseEntity<>(
+                new ApiResponse("Password Changed")
+        , HttpStatus.OK);
     }
 }
