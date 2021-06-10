@@ -6,10 +6,6 @@ build :
   image : maven:3.8-openjdk-16
   stage : build
   script : mvn clean package -DskipTests
-  variables :
-    SPRING_DATASOURCE_URL : $SPRING_DATASOURCE_URL
-    SPRING_DATASOURCE_USERNAME : $SPRING_DATASOURCE_USERNAME
-    SPRING_DATASOURCE_PASSWORD : $SPRING_DATASOURCE_PASSWORD
 
 deploy :
   stage: deploy
@@ -18,6 +14,7 @@ deploy :
     - apt-get update -qy
     - apt-get install -y ruby-dev
     - gem install dpl
+    - echo "SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE" >> .env
     - dpl --provider=heroku --app=$APP_NAME --api-key=$HEROKU_API_KEY
   only:
     - develop
