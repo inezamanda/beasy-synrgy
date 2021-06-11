@@ -39,5 +39,5 @@ public class Contact {
 
     @OneToMany
     @JoinColumn(name = "contact_id")
-    private List<Transaction> transactions;
+    private List<Transfer> transfers;
 }
