@@ -12,11 +12,18 @@ import com.synrgybootcamp.project.service.ContactService;
 import com.synrgybootcamp.project.util.ApiException;
 import com.synrgybootcamp.project.web.model.request.ContactRequest;
 import com.synrgybootcamp.project.web.model.response.ContactResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
+@Slf4j
 public class ContactServiceImpl implements ContactService {
     @Autowired
     ContactRepository contactRepository;
@@ -29,6 +36,45 @@ public class ContactServiceImpl implements ContactService {
 
     @Autowired
     UserInformation userInformation;
+
+    @Override
+    public List<ContactResponse> getAllContacts(String keyword) {
+        List<Contact> contacts;
+
+        User loggedInUser = userRepository.findById(userInformation.getUserID())
+                .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
+
+        if (keyword == null) {
+            contacts = contactRepository.findByUser(loggedInUser);
+        } else {
+            List<Contact> contactsResultByName = contactRepository.
+                    findByNameIsContainingIgnoreCaseAndUser(keyword, loggedInUser);
+
+            List<String> ids = Optional.ofNullable(contactsResultByName)
+                    .filter(val -> !CollectionUtils.isEmpty(val))
+                    .map(data -> data.stream().map(Contact::getId).collect(Collectors.toList()))
+                    .orElse(Arrays.asList("-"));
+
+            List<Contact> contactsResultByAccountNumber = contactRepository
+                    .findByAccountNumberContainingIgnoreCaseAndUserAndIdNotIn(keyword, loggedInUser, ids);
+
+            contacts = Stream
+                    .concat(contactsResultByName.stream(), contactsResultByAccountNumber.stream())
+                    .collect(Collectors.toList());
+        }
+
+        return contacts
+                .stream()
+                .map(contact -> ContactResponse
+                        .builder()
+                        .name(contact.getName())
+                        .account_number(contact.getAccountNumber())
+                        .bank_id(contact.getBank().getId())
+                        .bank_name(contact.getBank().getName())
+                        .cost(contact.getBank().getPrimary() ? 0 : TransactionConstants.DIFFERENT_BANK_FEE)
+                        .build()
+                ).collect(Collectors.toList());
+    }
 
     @Override
     public ContactResponse createContact(ContactRequest contactRequest) {

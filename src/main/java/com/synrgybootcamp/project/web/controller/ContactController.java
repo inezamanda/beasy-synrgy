@@ -10,14 +10,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/contacts")
 public class ContactController {
     @Autowired
     ContactServiceImpl contactService;
 
+    @GetMapping
+    public ResponseEntity<ApiResponse> listContact(
+            @RequestParam(required = false) String keyword
+    ) {
+        List<ContactResponse> contacts = contactService.getAllContacts(keyword);
+        return new ResponseEntity<>(
+                new ApiResponse("success get all contacts", contacts), HttpStatus.OK
+        );
+    }
+
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> addContact(@RequestBody ContactRequest contactRequest){
         ContactResponse contact = contactService.createContact(contactRequest);
         return new ResponseEntity<>(
@@ -26,7 +37,6 @@ public class ContactController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> getContactById(
             @PathVariable String id){
         ContactResponse detailContact = contactService.getContactById(id);
@@ -37,7 +47,6 @@ public class ContactController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> updateContactById(
             @PathVariable String id,
             @RequestBody ContactRequest contactRequest){
@@ -48,7 +57,6 @@ public class ContactController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> deleteContactById(@PathVariable String id){
         boolean deleted = contactService.deleteContactById(id);
 
