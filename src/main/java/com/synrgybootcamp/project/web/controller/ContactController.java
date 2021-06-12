@@ -28,6 +28,14 @@ public class ContactController {
         );
     }
 
+    @GetMapping("/recent")
+    public ResponseEntity<ApiResponse> recentContacts(){
+        List<ContactResponse> contacts = contactService.recentContacts();
+        return new ResponseEntity<>(
+                new ApiResponse("success get all contacts", contacts), HttpStatus.OK
+        );
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse> addContact(@RequestBody ContactRequest contactRequest){
         ContactResponse contact = contactService.createContact(contactRequest);

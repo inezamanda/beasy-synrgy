@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface ContactService {
     List<ContactResponse> getAllContacts(String keyword);
+    List<ContactResponse> recentContacts();
     ContactResponse createContact(ContactRequest contactRequest);
     ContactResponse getContactById(String id);
     ContactResponse updateContactById(String id, ContactRequest contactRequest);

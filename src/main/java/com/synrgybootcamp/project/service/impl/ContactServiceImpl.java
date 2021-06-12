@@ -1,12 +1,9 @@
 package com.synrgybootcamp.project.service.impl;
 
 import com.synrgybootcamp.project.constant.TransactionConstants;
-import com.synrgybootcamp.project.entity.Bank;
-import com.synrgybootcamp.project.entity.Contact;
-import com.synrgybootcamp.project.entity.User;
-import com.synrgybootcamp.project.repository.BankRepository;
-import com.synrgybootcamp.project.repository.ContactRepository;
-import com.synrgybootcamp.project.repository.UserRepository;
+import com.synrgybootcamp.project.entity.*;
+import com.synrgybootcamp.project.enums.TransactionType;
+import com.synrgybootcamp.project.repository.*;
 import com.synrgybootcamp.project.security.utility.UserInformation;
 import com.synrgybootcamp.project.service.ContactService;
 import com.synrgybootcamp.project.util.ApiException;
@@ -33,6 +30,9 @@ public class ContactServiceImpl implements ContactService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    TransactionRepository transactionRepository;
 
     @Autowired
     UserInformation userInformation;
@@ -67,6 +67,42 @@ public class ContactServiceImpl implements ContactService {
                 .stream()
                 .map(contact -> ContactResponse
                         .builder()
+                        .id(contact.getId())
+                        .name(contact.getName())
+                        .account_number(contact.getAccountNumber())
+                        .bank_id(contact.getBank().getId())
+                        .bank_name(contact.getBank().getName())
+                        .cost(contact.getBank().getPrimary() ? 0 : TransactionConstants.DIFFERENT_BANK_FEE)
+                        .build()
+                ).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ContactResponse> recentContacts() {
+
+        User loggedInUser = userRepository.findById(userInformation.getUserID())
+                .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
+
+        List<Transaction> recentTransaction = transactionRepository.findByUserAndTypeOrderByDateDesc(loggedInUser, TransactionType.TRANSFER);
+
+        List<Contact> recentContacts = new ArrayList<>();
+
+        recentTransaction.stream().forEach(
+                transaction -> {
+                    if (recentContacts.size() < 3){
+                        Contact currContact = transaction.getTransfer().getContact();
+                        if (!CollectionUtils.contains(recentContacts.iterator(), currContact)) {
+                            recentContacts.add(currContact);
+                        }
+                    }
+                }
+        );
+
+        return recentContacts
+                .stream()
+                .map(contact -> ContactResponse
+                        .builder()
+                        .id(contact.getId())
                         .name(contact.getName())
                         .account_number(contact.getAccountNumber())
                         .bank_id(contact.getBank().getId())
@@ -82,7 +118,7 @@ public class ContactServiceImpl implements ContactService {
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "Bank tidak ditemukan"));
 
         User user = userRepository.findById(userInformation.getUserID())
-                .orElse(null);
+                .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
 
         Contact contact = contactRepository.save(
                 Contact.builder()
@@ -111,6 +147,7 @@ public class ContactServiceImpl implements ContactService {
                 ? null
                 : ContactResponse
                 .builder()
+                .id(contact.getId())
                 .name(contact.getName())
                 .account_number(contact.getAccountNumber())
                 .bank_id(contact.getBank().getId())

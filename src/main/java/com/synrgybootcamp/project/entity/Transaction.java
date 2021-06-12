@@ -36,9 +36,8 @@ public class Transaction {
     private Integer totalAmount;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @CreationTimestamp
-    @Column(name = "date")
-    private Date date;
+    @Column(name = "date", updatable = false)
+    private Date date = new Date();
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")

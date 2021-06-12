@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Date;
 
 @Service
 public class TransferServiceImpl implements TransferService {
@@ -72,7 +71,7 @@ public class TransferServiceImpl implements TransferService {
         Transaction transaction = transactionRepository.save(
                 Transaction
                         .builder()
-                        .description("Transfer Out (" + contact.getBank() + "-" + contact.getAccountNumber() + ")")
+                        .description("Transfer Out (" + contact.getBank().getName() + "-" + contact.getAccountNumber() + ")")
                         .user(user)
                         .totalAmount(transferRequest.getAmount() + cost)
                         .type(TransactionType.TRANSFER)
