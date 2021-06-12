@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ContactResponse {
+    String id;
     String name;
     String account_number;
     String bank_id;
