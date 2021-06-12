@@ -4,6 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.mail.Multipart;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -11,6 +15,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PocketRequest {
     String name;
-    String picture;
+    MultipartFile picture;
     Integer target;
+    Boolean primary;
+    Date date;
+
 }
