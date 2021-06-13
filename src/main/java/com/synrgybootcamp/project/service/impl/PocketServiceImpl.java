@@ -5,6 +5,7 @@ import com.synrgybootcamp.project.entity.PocketTransaction;
 import com.synrgybootcamp.project.entity.User;
 import com.synrgybootcamp.project.enums.PocketAction;
 import com.synrgybootcamp.project.enums.PocketBalanceStatus;
+import com.synrgybootcamp.project.enums.PocketTransactionType;
 import com.synrgybootcamp.project.repository.PocketRepository;
 import com.synrgybootcamp.project.repository.PocketTransactionRepository;
 import com.synrgybootcamp.project.repository.UserRepository;
@@ -198,7 +199,7 @@ public class PocketServiceImpl implements PocketService {
                 PocketAction.INCREASE
         );
 
-        PocketTransaction transactionResult = createPocketTransaction(sourcePocket, destinationPocket, payload.getAmount());
+        PocketTransaction transactionResult = createPocketTransaction(sourcePocket, destinationPocket, payload.getAmount(), PocketTransactionType.TOP_UP);
 
         return TopUpPocketBalanceResponse
                 .builder()
@@ -226,7 +227,7 @@ public class PocketServiceImpl implements PocketService {
                 PocketAction.INCREASE
         );
 
-        PocketTransaction transactionResult = createPocketTransaction(sourcePocket, destinationPocket, payload.getAmount());
+        PocketTransaction transactionResult = createPocketTransaction(sourcePocket, destinationPocket, payload.getAmount(), PocketTransactionType.MOVE);
 
         return MovePocketBalanceResponse
                 .builder()
@@ -259,7 +260,7 @@ public class PocketServiceImpl implements PocketService {
         return pocketRepository.save(pocket);
     }
 
-    private PocketTransaction createPocketTransaction(Pocket source, Pocket destination, Integer amount) {
+    private PocketTransaction createPocketTransaction(Pocket source, Pocket destination, Integer amount, PocketTransactionType pocketTransactionType) {
         return pocketTransactionRepository.save(
                 PocketTransaction
                         .builder()
@@ -267,6 +268,7 @@ public class PocketServiceImpl implements PocketService {
                         .sourcePocket(source)
                         .destinationPocket(destination)
                         .amount(amount)
+                        .pocketTransactionType(pocketTransactionType)
                         .build()
         );
     }
