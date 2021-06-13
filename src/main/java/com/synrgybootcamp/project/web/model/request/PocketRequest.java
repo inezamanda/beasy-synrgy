@@ -17,6 +17,5 @@ public class PocketRequest {
     String name;
     MultipartFile picture;
     Integer target;
-    Boolean primary;
-    Date date;
+    Date dueDate;
 }

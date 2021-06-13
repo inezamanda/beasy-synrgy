@@ -2,9 +2,9 @@ package com.synrgybootcamp.project.service.impl;
 
 import com.synrgybootcamp.project.entity.Pocket;
 import com.synrgybootcamp.project.entity.PocketTransaction;
-import com.synrgybootcamp.project.entity.Transaction;
 import com.synrgybootcamp.project.entity.User;
 import com.synrgybootcamp.project.enums.PocketAction;
+import com.synrgybootcamp.project.enums.PocketBalanceStatus;
 import com.synrgybootcamp.project.repository.PocketRepository;
 import com.synrgybootcamp.project.repository.PocketTransactionRepository;
 import com.synrgybootcamp.project.repository.UserRepository;
@@ -21,6 +21,7 @@ import com.synrgybootcamp.project.web.model.response.PocketResponse;
 import com.synrgybootcamp.project.web.model.response.PocketTransactionResponse;
 import com.synrgybootcamp.project.web.model.response.TopUpPocketBalanceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,6 +52,134 @@ public class PocketServiceImpl implements PocketService {
     @Autowired
     UploadFileUtil uploadFileUtil;
 
+    @Override
+    public PocketResponse createPocket(PocketRequest pocketRequest) {
+        User user = userRepository.findById(userInformation.getUserID())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user yang dipilih tidak ditemukan"));
+        String uploadFile = uploadFileUtil.upload(pocketRequest.getPicture());
+
+        Pocket pocket = pocketRepository.save(
+                Pocket.builder()
+                        .name(pocketRequest.getName())
+                        .picture(uploadFile)
+                        .target(pocketRequest.getTarget())
+                        .primary(false)
+                        .user(user)
+                        .dueDate(pocketRequest.getDueDate())
+                        .balance(0)
+                        .build()
+        );
+
+        return PocketResponse.builder()
+                .id(pocket.getId())
+                .userId(userInformation.getUserID())
+                .pocketName(pocket.getName())
+                .picture(uploadFile)
+                .target(pocket.getTarget())
+                .balance(0)
+                .dueDate(pocket.getDueDate())
+                .build();
+    }
+
+    @Override
+    public List<PocketResponse> getAllPocket() {
+        User user = userRepository.findById(userInformation.getUserID())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user yang dipilih tidak ditemukan"));
+
+        List<Pocket> pocket = pocketRepository.findByUser(user);
+
+        return pocket.stream()
+                .map(p -> PocketResponse
+                        .builder()
+                        .id(p.getId())
+                        .userId(p.getUser().getId())
+                        .picture(p.getPicture())
+                        .pocketName(p.getName())
+                        .primary(p.getPrimary())
+                        .target(p.getTarget())
+                        .balance(p.getBalance())
+                        .dueDate(p.getDueDate())
+                        .build()
+                ).collect(Collectors.toList());
+    }
+
+    @Override
+    public PocketResponse getDetailPocketByID(String id) {
+        Pocket pocket = pocketRepository.findById(id)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user yang dipilih tidak ditemukan"));
+
+        return PocketResponse
+                .builder()
+                .id(pocket.getId())
+                .userId(pocket.getUser().getId())
+                .picture(pocket.getPicture())
+                .pocketName(pocket.getName())
+                .primary(pocket.getPrimary())
+                .target(pocket.getTarget())
+                .balance(pocket.getBalance())
+                .dueDate(pocket.getDueDate())
+                .build();
+    }
+
+    @Override
+    public List<PocketTransactionResponse> getHistory(String pocketId, Sort sort) {
+        User user = userRepository.findById(userInformation.getUserID())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user yang dipilih tidak ditemukan"));
+        Pocket pocket = pocketRepository.findById(pocketId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "pocket yang dipilih tidak ditemukan"));
+
+        List<PocketTransaction> transactions = pocketTransactionRepository
+                .findByUserAndSourcePocketOrUserAndDestinationPocket(user, pocket, user, pocket);
+
+        return transactions.stream()
+                .map(pocketTransaction -> PocketTransactionResponse.builder()
+                        .amount(pocketTransaction.getAmount())
+                        .pocketTransactionType(pocketTransaction.getPocketTransactionType())
+                        .pocketBalanceStatus(
+                                pocketTransaction.getSourcePocket().getId() == pocketId
+                                        ? PocketBalanceStatus.PLUS
+                                        : PocketBalanceStatus.MINUS
+                        ).date(pocketTransaction.getDate())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public PocketResponse updatePocketById(@PathVariable String id, PocketRequest pocketRequest) {
+        Pocket pocket = pocketRepository.findById(id).orElseThrow(()->
+                new ApiException(HttpStatus.NOT_FOUND,"Pocket tidak ditemukan"));
+
+        String uploadFile = uploadFileUtil.upload(pocketRequest.getPicture());
+
+        pocket.setName(pocketRequest.getName());
+        pocket.setDueDate(pocketRequest.getDueDate());
+        pocket.setTarget(pocketRequest.getTarget());
+        pocket.setPicture(uploadFile);
+
+        Pocket pocketResult = pocketRepository.save(pocket);
+
+        return PocketResponse
+                .builder()
+                .id(pocketResult.getId())
+                .userId(pocketResult.getUser().getId())
+                .picture(pocketResult.getPicture())
+                .pocketName(pocketResult.getName())
+                .primary(pocketResult.getPrimary())
+                .target(pocketResult.getTarget())
+                .balance(pocketResult.getBalance())
+                .dueDate(pocketResult.getDueDate())
+                .build();
+    }
+
+    @Override
+    public boolean deletePocketById(String id) {
+        Pocket pocket = pocketRepository.findById(id).orElseThrow(()->
+                new ApiException(HttpStatus.NOT_FOUND,"Pocket tidak ditemukan"));
+
+        pocketRepository.delete(pocket);
+
+        return true;
+    }
 
     @Override
     @Transactional
@@ -141,117 +270,5 @@ public class PocketServiceImpl implements PocketService {
                         .build()
         );
     }
-
-    @Override
-    public List<PocketTransactionResponse> getHistory(String userId) {
-       List<PocketTransaction> transactions = pocketTransactionRepository.findHistoryPocket(userId);
-
-        return transactions.stream().map(t -> PocketTransactionResponse
-                .builder()
-                .userId(userId)
-                .id(t.getId())
-                .amount(t.getAmount())
-                .date(t.getDate())
-//                .destinationPocket(t.getDestinationPocket())
-//                .sourcePocket(t.getSourcePocket())
-                .build()).collect(Collectors.toList());
-    }
-
-
-    @Override
-    public List<PocketResponse> getAllPocket(String userId) {
-        List<Pocket> pocket = pocketRepository.findListPocket(userId);
-
-        return pocket.stream().map(p -> PocketResponse
-                .builder()
-                .userId(userId)
-                .id(p.getId())
-                .picture(p.getPicture())
-                .pocket_name(p.getName())
-                .target(p.getTarget())
-                .primary(p.getPrimary())
-                .balance(p.getBalance())
-                .date(p.getDate())
-                .build()).collect(Collectors.toList());
-
-
-    }
-
-    @Override
-    public PocketResponse getDetailPocketByID(String id) {
-        Pocket pocket = pocketRepository.findById(id).orElse(null);
-
-        return pocket == null
-                ? null : PocketResponse.builder()
-                .id(pocket.getId())
-                .userId(userInformation.getUserID())
-                .picture(pocket.getPicture())
-                .pocket_name(pocket.getName())
-                .target(pocket.getTarget())
-                .primary(pocket.getPrimary())
-                .balance(pocket.getBalance())
-                .date(pocket.getDate())
-                .build();
-
-    }
-
-    @Override
-    public PocketResponse createPocket(PocketRequest pocketRequest) {
-        User user = userRepository.findById(userInformation.getUserID()).orElse(null);
-        String uploadFile = uploadFileUtil.upload(pocketRequest.getPicture());
-
-        Pocket pocket = pocketRepository.save(
-                Pocket.builder().name(pocketRequest.getName())
-                .picture(uploadFile).target(pocketRequest.getTarget())
-                        .primary(false).user(user).date(pocketRequest.getDate()).balance(0)
-                .build()
-        );
-
-
-        return PocketResponse.builder()
-                .id(pocket.getId())
-                .userId(userInformation.getUserID())
-                .pocket_name(pocket.getName())
-                .picture(uploadFile)
-                .target(pocket.getTarget())
-                .primary(pocket.getPrimary())
-                .balance(0)
-                .date(pocket.getDate())
-                .build();
-    }
-
-    @Override
-    public PocketResponse updatePocketById(@PathVariable String id, PocketRequest pocketRequest) {
-        Pocket pocket = pocketRepository.findById(id).orElseThrow(()->
-                new ApiException(HttpStatus.NOT_FOUND,"Pocket tidak ditemukan"));
-
-        pocket.setName(pocketRequest.getName());
-        pocket.setDate(pocketRequest.getDate());
-        pocket.setTarget(pocketRequest.getTarget());
-
-
-        Pocket pocketResult = pocketRepository.save(pocket);
-
-        return PocketResponse.builder()
-                .id(pocket.getId())
-                .userId(userInformation.getUserID())
-                .pocket_name(pocketResult.getName())
-                .picture(pocket.getPicture())
-                .target(pocketResult.getTarget())
-                .primary(pocket.getPrimary())
-                .balance(0)
-                .date(pocketResult.getDate())
-                .build();
-    }
-
-    @Override
-    public boolean deletePocketById(String id) {
-        Pocket pocket = pocketRepository.findById(id).orElseThrow(()->
-                new ApiException(HttpStatus.NOT_FOUND,"Pocket tidak ditemukan"));
-
-        pocketRepository.delete(pocket);
-        return true;
-    }
-
 
 }

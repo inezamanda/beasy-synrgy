@@ -15,13 +15,12 @@ import java.util.Date;
 public class PocketResponse {
     @JsonProperty("user_id")
     String userId;
-
     String id;
     String picture;
-    String pocket_name;
+    @JsonProperty("pocket_name")
+    String pocketName;
     Integer target;
-    Boolean primary;
     Integer balance;
-    Date date;
-
+    boolean primary;
+    Date dueDate;
 }

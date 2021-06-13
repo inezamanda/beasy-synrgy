@@ -12,6 +12,7 @@ import com.synrgybootcamp.project.web.model.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,33 +35,29 @@ public class PocketController {
     UploadFileUtil uploadFileUtil;
 
     @GetMapping("")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> getAllPockets(){
 
-        List<PocketResponse> pocketResponse = pocketService.getAllPocket(userInformation.getUserID());
+        List<PocketResponse> pocketResponse = pocketService.getAllPocket();
 
         return new ResponseEntity<>(
                 new ApiResponse("successfully get pocket user", pocketResponse),
                 HttpStatus.OK
         );
-
     }
 
-    @GetMapping("/history")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> getHistoryPockets(){
-
-        List<PocketTransactionResponse> transactionResponses = pocketService.getHistory(userInformation.getUserID());
+    @PostMapping("")
+    public ResponseEntity<ApiResponse> createPocket(
+            @ModelAttribute PocketRequest pocketRequest
+    ){
+        PocketResponse createPocket = pocketService.createPocket(pocketRequest);
 
         return new ResponseEntity<>(
-                new ApiResponse("successfully get history pocket", transactionResponses),
+                new ApiResponse("success create pocket data", createPocket),
                 HttpStatus.OK
         );
-
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> getPocketsByID(@PathVariable String id){
         PocketResponse detailPocket = pocketService.getDetailPocketByID(id);
 
@@ -70,8 +67,25 @@ public class PocketController {
         );
     }
 
+    @GetMapping("/{id}/history")
+    public ResponseEntity<ApiResponse> getHistoryPockets(
+            @PathVariable String id,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortOrder
+    ){
+        List<PocketTransactionResponse> transactionResponses = pocketService.getHistory(
+                id,
+                sortOrder.equals("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending()
+        );
+
+        return new ResponseEntity<>(
+                new ApiResponse("successfully get history pocket", transactionResponses),
+                HttpStatus.OK
+        );
+
+    }
+
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> deletePocketsByID(@PathVariable String id){
        boolean pocketDelete = pocketService.deletePocketById(id);
 
@@ -81,21 +95,11 @@ public class PocketController {
         );
     }
 
-    @PostMapping("")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> createPocket(@ModelAttribute PocketRequest pocketRequest,@RequestParam(value = "picture") MultipartFile picture){
-        PocketResponse createPocket = pocketService.createPocket(pocketRequest);
-//        uploadFileUtil.upload(picture);
-
-        return new ResponseEntity<>(
-                new ApiResponse("success create pocket data", createPocket),
-                HttpStatus.OK
-        );
-    }
-
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> updatePocketByID(@PathVariable String id,@RequestBody PocketRequest pocketRequest){
+    public ResponseEntity<ApiResponse> updatePocketByID(
+            @PathVariable String id,
+            @RequestBody PocketRequest pocketRequest
+    ){
        PocketResponse editPocket = pocketService.updatePocketById(id,pocketRequest);
 
         return new ResponseEntity<>(
@@ -103,11 +107,9 @@ public class PocketController {
         );
     }
 
-
-
-    @PostMapping("{pocketId}/topup")
+    @PostMapping("{id}/topup")
     public ResponseEntity<Object> topUpPocket(
-            @PathVariable String pocketId,
+            @PathVariable String id,
             @RequestBody TopUpPocketBalanceRequest payload
     ) {
         TopUpPocketBalanceResponse topUpResult = pocketService
@@ -115,7 +117,7 @@ public class PocketController {
                         userInformation.getUserID(),
                         TopUpPocketBalanceRequest
                                 .builder()
-                                .destination(pocketId)
+                                .destination(id)
                                 .amount(payload.getAmount())
                                 .build()
                 );
@@ -126,16 +128,16 @@ public class PocketController {
         );
     }
 
-    @PostMapping("{pocketId}/move")
+    @PostMapping("{id}/move")
     public ResponseEntity<Object> movePocketBalance(
-            @PathVariable String pocketId,
+            @PathVariable String id,
             @RequestBody MovePocketBalanceRequest payload
     ) {
         MovePocketBalanceResponse moveBalanceResult = pocketService
                 .moveBalance(
                         MovePocketBalanceRequest.builder()
                                 .amount(payload.getAmount())
-                                .source(pocketId)
+                                .source(id)
                                 .destination(payload.getDestination())
                                 .build()
                 );
@@ -145,7 +147,4 @@ public class PocketController {
                 , HttpStatus.OK
         );
     }
-
-
-
 }

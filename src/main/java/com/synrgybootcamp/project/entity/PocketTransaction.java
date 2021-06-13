@@ -35,7 +35,7 @@ public class PocketTransaction {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", length = 20)
-    private PocketTransactionType category;
+    private PocketTransactionType pocketTransactionType;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")

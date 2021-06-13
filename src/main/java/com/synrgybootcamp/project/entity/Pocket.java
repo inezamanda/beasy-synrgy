@@ -37,7 +37,8 @@ public class Pocket {
     private Integer balance;
 
     @Column(name = "date")
-    private Date date;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dueDate;
 
     @Column(name = "is_primary")
     private Boolean primary;

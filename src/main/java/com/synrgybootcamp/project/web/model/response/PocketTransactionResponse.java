@@ -1,7 +1,7 @@
 package com.synrgybootcamp.project.web.model.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.synrgybootcamp.project.entity.Pocket;
+import com.synrgybootcamp.project.enums.PocketBalanceStatus;
+import com.synrgybootcamp.project.enums.PocketTransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,11 +14,8 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 public class PocketTransactionResponse {
-    @JsonProperty("user_id")
-    String userId;
-    String id;
     Integer amount;
+    PocketTransactionType pocketTransactionType;
+    PocketBalanceStatus pocketBalanceStatus;
     Date date;
-//    Pocket destinationPocket;
-//    Pocket sourcePocket;
 }
