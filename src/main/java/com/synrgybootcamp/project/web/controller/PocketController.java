@@ -8,10 +8,7 @@ import com.synrgybootcamp.project.util.UploadFileUtil;
 import com.synrgybootcamp.project.web.model.request.MovePocketBalanceRequest;
 import com.synrgybootcamp.project.web.model.request.PocketRequest;
 import com.synrgybootcamp.project.web.model.request.TopUpPocketBalanceRequest;
-import com.synrgybootcamp.project.web.model.response.MovePocketBalanceResponse;
-import com.synrgybootcamp.project.web.model.response.PocketResponse;
-import com.synrgybootcamp.project.web.model.response.TopUpPocketBalanceResponse;
-import com.synrgybootcamp.project.web.model.response.UserBalanceResponse;
+import com.synrgybootcamp.project.web.model.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,6 +41,19 @@ public class PocketController {
 
         return new ResponseEntity<>(
                 new ApiResponse("successfully get pocket user", pocketResponse),
+                HttpStatus.OK
+        );
+
+    }
+
+    @GetMapping("/history")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ApiResponse> getHistoryPockets(){
+
+        List<PocketTransactionResponse> transactionResponses = pocketService.getHistory(userInformation.getUserID());
+
+        return new ResponseEntity<>(
+                new ApiResponse("successfully get history pocket", transactionResponses),
                 HttpStatus.OK
         );
 

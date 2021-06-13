@@ -19,5 +19,4 @@ public class PocketRequest {
     Integer target;
     Boolean primary;
     Date date;
-
 }

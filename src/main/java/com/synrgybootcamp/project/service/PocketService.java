@@ -5,6 +5,7 @@ import com.synrgybootcamp.project.web.model.request.PocketRequest;
 import com.synrgybootcamp.project.web.model.request.TopUpPocketBalanceRequest;
 import com.synrgybootcamp.project.web.model.response.MovePocketBalanceResponse;
 import com.synrgybootcamp.project.web.model.response.PocketResponse;
+import com.synrgybootcamp.project.web.model.response.PocketTransactionResponse;
 import com.synrgybootcamp.project.web.model.response.TopUpPocketBalanceResponse;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,5 +21,6 @@ public interface PocketService {
     PocketResponse createPocket(PocketRequest pocketRequest);
     PocketResponse updatePocketById(@PathVariable String id,PocketRequest pocketRequest);
     boolean deletePocketById(String id);
+    List<PocketTransactionResponse> getHistory(String userId);
 
 }

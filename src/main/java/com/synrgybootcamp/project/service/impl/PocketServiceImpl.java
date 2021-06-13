@@ -2,6 +2,7 @@ package com.synrgybootcamp.project.service.impl;
 
 import com.synrgybootcamp.project.entity.Pocket;
 import com.synrgybootcamp.project.entity.PocketTransaction;
+import com.synrgybootcamp.project.entity.Transaction;
 import com.synrgybootcamp.project.entity.User;
 import com.synrgybootcamp.project.enums.PocketAction;
 import com.synrgybootcamp.project.repository.PocketRepository;
@@ -17,6 +18,7 @@ import com.synrgybootcamp.project.web.model.request.PocketRequest;
 import com.synrgybootcamp.project.web.model.request.TopUpPocketBalanceRequest;
 import com.synrgybootcamp.project.web.model.response.MovePocketBalanceResponse;
 import com.synrgybootcamp.project.web.model.response.PocketResponse;
+import com.synrgybootcamp.project.web.model.response.PocketTransactionResponse;
 import com.synrgybootcamp.project.web.model.response.TopUpPocketBalanceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -140,6 +142,20 @@ public class PocketServiceImpl implements PocketService {
         );
     }
 
+    @Override
+    public List<PocketTransactionResponse> getHistory(String userId) {
+       List<PocketTransaction> transactions = pocketTransactionRepository.findHistoryPocket(userId);
+
+        return transactions.stream().map(t -> PocketTransactionResponse
+                .builder()
+                .userId(userId)
+                .id(t.getId())
+                .amount(t.getAmount())
+                .date(t.getDate())
+//                .destinationPocket(t.getDestinationPocket())
+//                .sourcePocket(t.getSourcePocket())
+                .build()).collect(Collectors.toList());
+    }
 
 
     @Override
@@ -187,7 +203,7 @@ public class PocketServiceImpl implements PocketService {
         Pocket pocket = pocketRepository.save(
                 Pocket.builder().name(pocketRequest.getName())
                 .picture(uploadFile).target(pocketRequest.getTarget())
-                        .primary(false).user(user).date(pocketRequest.getDate())
+                        .primary(false).user(user).date(pocketRequest.getDate()).balance(0)
                 .build()
         );
 
@@ -236,4 +252,6 @@ public class PocketServiceImpl implements PocketService {
         pocketRepository.delete(pocket);
         return true;
     }
+
+
 }

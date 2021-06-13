@@ -1,5 +1,6 @@
 package com.synrgybootcamp.project.entity;
 
+import com.synrgybootcamp.project.enums.PocketTransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,6 +32,10 @@ public class PocketTransaction {
     @CreationTimestamp
     @Column(name = "date")
     private Date date;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", length = 20)
+    private PocketTransactionType category;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
