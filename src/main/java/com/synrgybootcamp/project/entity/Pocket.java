@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -35,6 +36,10 @@ public class Pocket {
     @Column(name = "balance")
     private Integer balance;
 
+    @Column(name = "date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dueDate;
+
     @Column(name = "is_primary")
     private Boolean primary;
 
@@ -45,4 +50,6 @@ public class Pocket {
     @OneToMany
     @JoinColumn(name = "pocket_id")
     private List<PocketTransaction> pocketTransactions;
+
+
 }
