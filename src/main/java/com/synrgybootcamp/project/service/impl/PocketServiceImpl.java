@@ -68,6 +68,7 @@ public class PocketServiceImpl implements PocketService {
                         .user(user)
                         .dueDate(pocketRequest.getDueDate())
                         .balance(0)
+                        .delete(false)
                         .build()
         );
 
@@ -79,29 +80,57 @@ public class PocketServiceImpl implements PocketService {
                 .target(pocket.getTarget())
                 .balance(0)
                 .dueDate(pocket.getDueDate())
+                .delete(false)
+                .build();
+    }
+
+    @Override
+    public PocketResponse updatePocketById(@PathVariable String id, PocketRequest pocketRequest) {
+        Pocket pocket = pocketRepository.findById(id).orElseThrow(()->
+                new ApiException(HttpStatus.NOT_FOUND,"Pocket tidak ditemukan"));
+
+        String uploadFile = uploadFileUtil.upload(pocketRequest.getPicture());
+
+        pocket.setName(pocketRequest.getName());
+        pocket.setDueDate(pocketRequest.getDueDate());
+        pocket.setTarget(pocketRequest.getTarget());
+        pocket.setPicture(uploadFile);
+
+        Pocket pocketResult = pocketRepository.save(pocket);
+
+        return PocketResponse
+                .builder()
+                .id(pocketResult.getId())
+                .userId(pocketResult.getUser().getId())
+                .picture(pocketResult.getPicture())
+                .pocketName(pocketResult.getName())
+                .primary(pocketResult.getPrimary())
+                .target(pocketResult.getTarget())
+                .balance(pocketResult.getBalance())
+                .dueDate(pocketResult.getDueDate())
+                .delete(pocketResult.getDelete())
                 .build();
     }
 
     @Override
     public List<PocketResponse> getAllPocket() {
-        User user = userRepository.findById(userInformation.getUserID())
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user yang dipilih tidak ditemukan"));
 
-        List<Pocket> pocket = pocketRepository.findByUser(user);
+        List<Pocket> pockets = pocketRepository.findDeletedPocket(userInformation.getUserID());
 
-        return pocket.stream()
-                .map(p -> PocketResponse
-                        .builder()
-                        .id(p.getId())
-                        .userId(p.getUser().getId())
-                        .picture(p.getPicture())
-                        .pocketName(p.getName())
-                        .primary(p.getPrimary())
-                        .target(p.getTarget())
-                        .balance(p.getBalance())
-                        .dueDate(p.getDueDate())
-                        .build()
-                ).collect(Collectors.toList());
+            return pockets.stream()
+                    .map(p -> PocketResponse
+                            .builder()
+                            .id(p.getId())
+                            .userId(p.getUser().getId())
+                            .picture(p.getPicture())
+                            .pocketName(p.getName())
+                            .primary(p.getPrimary())
+                            .target(p.getTarget())
+                            .balance(p.getBalance())
+                            .dueDate(p.getDueDate())
+                            .build()
+                    ).collect(Collectors.toList());
+
     }
 
     @Override
@@ -138,46 +167,33 @@ public class PocketServiceImpl implements PocketService {
                         .pocketTransactionType(pocketTransaction.getPocketTransactionType())
                         .pocketBalanceStatus(
                                 pocketTransaction.getSourcePocket().getId() == pocketId
-                                        ? PocketBalanceStatus.PLUS
-                                        : PocketBalanceStatus.MINUS
+                                        ? PocketBalanceStatus.PLUS : PocketBalanceStatus.MINUS
                         ).date(pocketTransaction.getDate())
                         .build())
                 .collect(Collectors.toList());
     }
 
+
+
     @Override
-    public PocketResponse updatePocketById(@PathVariable String id, PocketRequest pocketRequest) {
+    public boolean deletePocketById(String id,String userId) {
+        Integer pocketBalance;
+
         Pocket pocket = pocketRepository.findById(id).orElseThrow(()->
                 new ApiException(HttpStatus.NOT_FOUND,"Pocket tidak ditemukan"));
 
-        String uploadFile = uploadFileUtil.upload(pocketRequest.getPicture());
+        pocket.setDelete(true);
+        if(pocket.getBalance()==0){
+            pocketRepository.save(pocket);
+        }else {
+            Pocket pocketPrimary = pocketRepository.findPrimaryPocket(userId)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "pocket utama tidak ditemukan"));
+            pocketBalance= pocket.getBalance() + pocketPrimary.getBalance();
+            pocketPrimary.setBalance(pocketBalance);
+            pocket.setBalance(0);
+            pocketRepository.save(pocket);
+        }
 
-        pocket.setName(pocketRequest.getName());
-        pocket.setDueDate(pocketRequest.getDueDate());
-        pocket.setTarget(pocketRequest.getTarget());
-        pocket.setPicture(uploadFile);
-
-        Pocket pocketResult = pocketRepository.save(pocket);
-
-        return PocketResponse
-                .builder()
-                .id(pocketResult.getId())
-                .userId(pocketResult.getUser().getId())
-                .picture(pocketResult.getPicture())
-                .pocketName(pocketResult.getName())
-                .primary(pocketResult.getPrimary())
-                .target(pocketResult.getTarget())
-                .balance(pocketResult.getBalance())
-                .dueDate(pocketResult.getDueDate())
-                .build();
-    }
-
-    @Override
-    public boolean deletePocketById(String id) {
-        Pocket pocket = pocketRepository.findById(id).orElseThrow(()->
-                new ApiException(HttpStatus.NOT_FOUND,"Pocket tidak ditemukan"));
-
-        pocketRepository.delete(pocket);
 
         return true;
     }

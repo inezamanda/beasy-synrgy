@@ -1,6 +1,5 @@
 package com.synrgybootcamp.project.web.controller;
 
-import com.synrgybootcamp.project.entity.Pocket;
 import com.synrgybootcamp.project.security.utility.UserInformation;
 import com.synrgybootcamp.project.service.impl.PocketServiceImpl;
 import com.synrgybootcamp.project.util.ApiResponse;
@@ -8,18 +7,16 @@ import com.synrgybootcamp.project.util.UploadFileUtil;
 import com.synrgybootcamp.project.web.model.request.MovePocketBalanceRequest;
 import com.synrgybootcamp.project.web.model.request.PocketRequest;
 import com.synrgybootcamp.project.web.model.request.TopUpPocketBalanceRequest;
-import com.synrgybootcamp.project.web.model.response.*;
+import com.synrgybootcamp.project.web.model.response.MovePocketBalanceResponse;
+import com.synrgybootcamp.project.web.model.response.PocketResponse;
+import com.synrgybootcamp.project.web.model.response.PocketTransactionResponse;
+import com.synrgybootcamp.project.web.model.response.TopUpPocketBalanceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -86,8 +83,8 @@ public class PocketController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deletePocketsByID(@PathVariable String id){
-       boolean pocketDelete = pocketService.deletePocketById(id);
+    public ResponseEntity<ApiResponse> deletePocketsByID(@PathVariable String id,String userId){
+       boolean pocketDelete = pocketService.deletePocketById(id,userId);
 
         return new ResponseEntity<>(
                 new ApiResponse(pocketDelete ?"success delete pocket data" : "data pocket tidak ditemukan" ),
@@ -98,8 +95,8 @@ public class PocketController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updatePocketByID(
             @PathVariable String id,
-            @RequestBody PocketRequest pocketRequest
-    ){
+            @ModelAttribute PocketRequest pocketRequest){
+
        PocketResponse editPocket = pocketService.updatePocketById(id,pocketRequest);
 
         return new ResponseEntity<>(

@@ -118,6 +118,7 @@ public class AuthServiceImpl implements AuthService {
                         .picture(null)
                         .primary(true)
                         .target(0)
+                        .delete(false)
                         .build()
         );
 
