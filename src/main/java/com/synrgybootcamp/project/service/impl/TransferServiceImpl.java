@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.TimeZone;
 
 @Service
 public class TransferServiceImpl implements TransferService {
@@ -69,6 +70,7 @@ public class TransferServiceImpl implements TransferService {
                 transferRequest.getAmount() + cost, PocketAction.DECREASE
         );
 
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Jakarta"));
         Date date = new Date();
         Transaction transaction = transactionRepository.save(
                 Transaction
@@ -97,11 +99,13 @@ public class TransferServiceImpl implements TransferService {
                 .builder()
                 .status(TransferStatus.SUCCESS.name())
                 .bankName(contact.getBank().getName())
+                .accountName(contact.getName())
                 .beneficiaryAccountNumber(contact.getAccountNumber())
                 .amount(transfer.getAmount())
                 .message(transfer.getNote())
                 .on(transaction.getDate())
                 .totalTransfer(transfer.getAmount() + transfer.getCost())
+                .refCode(transaction.getId())
                 .build();
     }
 
