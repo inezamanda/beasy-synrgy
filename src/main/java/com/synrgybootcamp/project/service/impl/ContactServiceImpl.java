@@ -130,10 +130,12 @@ public class ContactServiceImpl implements ContactService {
         );
 
         return ContactResponse.builder()
+                .id(contact.getId())
                 .name(contact.getName())
                 .account_number(contact.getAccountNumber())
                 .bank_id(bank.getId())
                 .bank_name(bank.getName())
+                .cost(contact.getBank().getPrimary() ? 0 : TransactionConstants.DIFFERENT_BANK_FEE)
                 .build();
     }
 

@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 
 @Service
 public class TransferServiceImpl implements TransferService {
@@ -68,6 +69,7 @@ public class TransferServiceImpl implements TransferService {
                 transferRequest.getAmount() + cost, PocketAction.DECREASE
         );
 
+        Date date = new Date();
         Transaction transaction = transactionRepository.save(
                 Transaction
                         .builder()
@@ -75,6 +77,7 @@ public class TransferServiceImpl implements TransferService {
                         .user(user)
                         .totalAmount(transferRequest.getAmount() + cost)
                         .type(TransactionType.TRANSFER)
+                        .date(date)
                         .build()
         );
 
@@ -93,7 +96,7 @@ public class TransferServiceImpl implements TransferService {
         return TransferResponse
                 .builder()
                 .status(TransferStatus.SUCCESS.name())
-                .bankName(contact.getBank().getId())
+                .bankName(contact.getBank().getName())
                 .beneficiaryAccountNumber(contact.getAccountNumber())
                 .amount(transfer.getAmount())
                 .message(transfer.getNote())
