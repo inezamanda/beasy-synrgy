@@ -43,6 +43,9 @@ public class Pocket {
     @Column(name = "is_primary")
     private Boolean primary;
 
+    @Column(name = "is_deleted")
+    private Boolean delete;
+
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
