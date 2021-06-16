@@ -16,10 +16,5 @@ public interface PocketRepository extends JpaRepository<Pocket, String> {
     List<Pocket> findByUser(User user);
     @Query(value = "SELECT * FROM pockets p WHERE p.user_id =:userId AND is_deleted = false",nativeQuery = true)
     List<Pocket> findDeletedPocket(@Param("userId") String userId);
-    @Query(value = "SELECT * FROM pockets p WHERE balance = 0",nativeQuery = true)
-    Optional<Pocket> findBalanceZero();
-    @Query(value = "SELECT * FROM pockets p WHERE balance > 0",nativeQuery = true)
-    Optional<Pocket> findBalanceHigh();
 
 }
-//id,balance,name,picture,is_primary,target, user_id, date

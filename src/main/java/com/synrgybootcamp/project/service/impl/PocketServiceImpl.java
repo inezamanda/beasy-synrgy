@@ -189,7 +189,7 @@ public class PocketServiceImpl implements PocketService {
             pocket.setDelete(true);
             pocketRepository.save(pocket);
         }else {
-            throw new ApiException(HttpStatus.NOT_FOUND, "Tidak dapat hapus pocket! Saldo pocket masih ada, harap pindah/move saldo ke pocket utama anda");
+            throw new ApiException(HttpStatus.OK, "Tidak dapat hapus pocket! Saldo pocket masih ada, harap pindah/move saldo ke pocket utama anda");
 
         }
 
