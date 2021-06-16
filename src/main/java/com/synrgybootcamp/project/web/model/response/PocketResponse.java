@@ -23,4 +23,5 @@ public class PocketResponse {
     Integer balance;
     boolean primary;
     Date dueDate;
+    boolean delete;
 }
