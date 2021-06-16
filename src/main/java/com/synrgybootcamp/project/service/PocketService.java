@@ -19,7 +19,7 @@ public interface PocketService {
     List<PocketResponse> getAllPocket();
     PocketResponse getDetailPocketByID(String id);
     PocketResponse updatePocketById(String id,PocketRequest pocketRequest);
-    boolean deletePocketById(String id,String userId);
+    boolean deletePocketById(String id);
     List<PocketTransactionResponse> getHistory(String pocketId, Sort sort);
     TopUpPocketBalanceResponse topUpBalance(String userId, TopUpPocketBalanceRequest payload);
     MovePocketBalanceResponse moveBalance(MovePocketBalanceRequest payload);

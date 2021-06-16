@@ -83,8 +83,8 @@ public class PocketController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deletePocketsByID(@PathVariable String id,String userId){
-       boolean pocketDelete = pocketService.deletePocketById(id,userId);
+    public ResponseEntity<ApiResponse> deletePocketsByID(@PathVariable String id){
+       boolean pocketDelete = pocketService.deletePocketById(id);
 
         return new ResponseEntity<>(
                 new ApiResponse(pocketDelete ?"success delete pocket data" : "data pocket tidak ditemukan" ),

@@ -21,6 +21,8 @@ import com.synrgybootcamp.project.web.model.response.MovePocketBalanceResponse;
 import com.synrgybootcamp.project.web.model.response.PocketResponse;
 import com.synrgybootcamp.project.web.model.response.PocketTransactionResponse;
 import com.synrgybootcamp.project.web.model.response.TopUpPocketBalanceResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -33,7 +35,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class PocketServiceImpl implements PocketService {
-
+    private static final Logger LOGGER= LoggerFactory.getLogger(PocketServiceImpl.class);
 
     @Autowired
     private PocketRepository pocketRepository;
@@ -176,22 +178,19 @@ public class PocketServiceImpl implements PocketService {
 
 
     @Override
-    public boolean deletePocketById(String id,String userId) {
-        Integer pocketBalance;
+    public boolean deletePocketById(String id ) {
 
         Pocket pocket = pocketRepository.findById(id).orElseThrow(()->
                 new ApiException(HttpStatus.NOT_FOUND,"Pocket tidak ditemukan"));
 
-        pocket.setDelete(true);
+
         if(pocket.getBalance()==0){
+
+            pocket.setDelete(true);
             pocketRepository.save(pocket);
         }else {
-            Pocket pocketPrimary = pocketRepository.findPrimaryPocket(userId)
-                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "pocket utama tidak ditemukan"));
-            pocketBalance= pocket.getBalance() + pocketPrimary.getBalance();
-            pocketPrimary.setBalance(pocketBalance);
-            pocket.setBalance(0);
-            pocketRepository.save(pocket);
+            throw new ApiException(HttpStatus.NOT_FOUND, "Tidak dapat hapus pocket! Saldo pocket masih ada, harap pindah/move saldo ke pocket utama anda");
+
         }
 
 
