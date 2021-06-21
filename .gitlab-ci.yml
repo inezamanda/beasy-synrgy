@@ -6,6 +6,8 @@ build :
   image : maven:3.8-openjdk-16
   stage : build
   script : mvn clean package -DskipTests
+  only :
+    - develop
 
 deploy :
   stage: deploy

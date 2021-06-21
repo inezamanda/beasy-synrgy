@@ -19,6 +19,9 @@ public class TransferResponse {
     @JsonProperty("bank_name")
     String bankName;
 
+    @JsonProperty("account_name")
+    String accountName;
+
     @JsonProperty("beneficiary_account_number")
     String beneficiaryAccountNumber;
 
@@ -28,6 +31,8 @@ public class TransferResponse {
     @JsonProperty("total_transfer")
     Integer totalTransfer;
 
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss", timezone = "GMT+7")
     Date on;
+
+    String refCode;
 }

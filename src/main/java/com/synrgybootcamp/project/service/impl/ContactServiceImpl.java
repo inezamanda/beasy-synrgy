@@ -3,6 +3,7 @@ package com.synrgybootcamp.project.service.impl;
 import com.synrgybootcamp.project.constant.TransactionConstants;
 import com.synrgybootcamp.project.entity.*;
 import com.synrgybootcamp.project.enums.TransactionType;
+import com.synrgybootcamp.project.helper.ContactHelper;
 import com.synrgybootcamp.project.repository.*;
 import com.synrgybootcamp.project.security.utility.UserInformation;
 import com.synrgybootcamp.project.service.ContactService;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -83,33 +85,12 @@ public class ContactServiceImpl implements ContactService {
         User loggedInUser = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
 
-        List<Transaction> recentTransaction = transactionRepository.findByUserAndTypeOrderByDateDesc(loggedInUser, TransactionType.TRANSFER);
-
-        List<Contact> recentContacts = new ArrayList<>();
-
-        recentTransaction.stream().forEach(
-                transaction -> {
-                    if (recentContacts.size() < 3){
-                        Contact currContact = transaction.getTransfer().getContact();
-                        if (!CollectionUtils.contains(recentContacts.iterator(), currContact)) {
-                            recentContacts.add(currContact);
-                        }
-                    }
-                }
-        );
-
-        return recentContacts
-                .stream()
-                .map(contact -> ContactResponse
-                        .builder()
-                        .id(contact.getId())
-                        .name(contact.getName())
-                        .account_number(contact.getAccountNumber())
-                        .bank_id(contact.getBank().getId())
-                        .bank_name(contact.getBank().getName())
-                        .cost(contact.getBank().getPrimary() ? 0 : TransactionConstants.DIFFERENT_BANK_FEE)
-                        .build()
-                ).collect(Collectors.toList());
+        return Optional.ofNullable(transactionRepository
+                .findByUserAndTypeOrderByDateDesc(loggedInUser, TransactionType.TRANSFER))
+                .map(ContactHelper::getFromTransaction)
+                .map(ContactHelper::fetchRecentContact)
+                .map(ContactHelper::toWebResponse)
+                .orElse(new ArrayList<>());
     }
 
     @Override
@@ -130,10 +111,12 @@ public class ContactServiceImpl implements ContactService {
         );
 
         return ContactResponse.builder()
+                .id(contact.getId())
                 .name(contact.getName())
                 .account_number(contact.getAccountNumber())
                 .bank_id(bank.getId())
                 .bank_name(bank.getName())
+                .cost(contact.getBank().getPrimary() ? 0 : TransactionConstants.DIFFERENT_BANK_FEE)
                 .build();
     }
 

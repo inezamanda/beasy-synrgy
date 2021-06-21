@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -55,6 +56,14 @@ public class User {
     @Column(name = "verif_code_status")
     private Boolean verifCodeStatus;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "last_mission_completion_time")
+    private Date date = new Date();
+
+    @ManyToOne
+    @JoinColumn(name = "current_planet_id", referencedColumnName = "id")
+    private Planet planet;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "ID"),
@@ -80,6 +89,14 @@ public class User {
     @OneToMany
     @JoinColumn(name = "user_id")
     private List<Transfer> transfers;
+
+    @OneToMany
+    @JoinColumn(name = "user_id")
+    private List<UserReward> userRewards;
+
+    @OneToMany
+    @JoinColumn(name = "user_id")
+    private List<UserMission> userMissions;
 
     @Override
     public boolean equals(Object o) {
