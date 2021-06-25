@@ -30,7 +30,7 @@ public class Planet {
     private String story_telling;
 
     @Column(name = "sequence")
-    private String sequence;
+    private Integer sequence;
 
     @OneToOne(mappedBy = "planet")
     private RewardPlanet rewardPlanet;
