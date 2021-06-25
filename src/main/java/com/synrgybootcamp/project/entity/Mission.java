@@ -28,7 +28,7 @@ public class Mission {
     @Column(name = "mission_type")
     private MissionType missionType;
 
-    @Column(name = "Target")
+    @Column(name = "target")
     private Integer target;
 
     @Column(name = "wording")

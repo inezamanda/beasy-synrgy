@@ -1,6 +1,6 @@
 package com.synrgybootcamp.project.entity;
 
-import com.synrgybootcamp.project.enums.RewardPlanetName;
+import com.synrgybootcamp.project.enums.RewardPlanetType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,8 +24,8 @@ public class RewardPlanet {
     private String id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "name")
-    private RewardPlanetName rewardName;
+    @Column(name = "type")
+    private RewardPlanetType type;
 
     @Column(name = "wording")
     private String wording;

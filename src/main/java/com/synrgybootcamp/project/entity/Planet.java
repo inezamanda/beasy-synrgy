@@ -26,11 +26,17 @@ public class Planet {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "story_telling", columnDefinition = "TEXT")
-    private String story_telling;
+    @Column(name = "storytelling", columnDefinition = "TEXT")
+    private String storytelling;
+
+    @Column(name = "image")
+    private String image;
 
     @Column(name = "sequence")
     private Integer sequence;
+
+    @Column(name = "wording")
+    private String wording;
 
     @OneToOne(mappedBy = "planet")
     private RewardPlanet rewardPlanet;
