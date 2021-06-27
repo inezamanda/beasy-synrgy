@@ -5,5 +5,6 @@ public enum MobileOperator {
     INDOSAT,
     XL,
     TRI,
+    AXIS,
     SMARTFREN
 }

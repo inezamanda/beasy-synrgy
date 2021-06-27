@@ -1,5 +1,6 @@
 package com.synrgybootcamp.project.enums;
 
 public enum TransactionType {
-    TRANSFER
+    TRANSFER,
+    PAYMENT_MOBILE
 }

@@ -1,7 +1,7 @@
 package com.synrgybootcamp.project.entity;
 
 import com.synrgybootcamp.project.enums.MobileOperator;
-import com.synrgybootcamp.project.enums.PaymentMobileType;
+import com.synrgybootcamp.project.enums.MobileType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,7 +35,7 @@ public class PaymentMobile {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    private PaymentMobileType mobileType;
+    private MobileType mobileType;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "operator")
