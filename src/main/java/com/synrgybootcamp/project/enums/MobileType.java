@@ -1,6 +1,6 @@
 package com.synrgybootcamp.project.enums;
 
-public enum PaymentMobileType {
+public enum MobileType {
     CREDIT,
     DATA
 }
