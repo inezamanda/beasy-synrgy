@@ -30,7 +30,7 @@ public class PlanetServiceImpl implements PlanetService {
         return planets.stream().map(p -> PlanetResponse.builder()
                 .id(p.getId())
                 .name(p.getName())
-                .story_telling(p.getStory_telling())
+                .story_telling(p.getStorytelling())
                 .sequence(p.getSequence()).build()).collect(Collectors.toList());
     }
 
@@ -40,7 +40,7 @@ public class PlanetServiceImpl implements PlanetService {
         Planet planet = planetRepository.save(
                 Planet.builder()
                         .name(planetRequest.getName())
-                        .story_telling(planetRequest.getStory_telling())
+                        .storytelling(planetRequest.getStory_telling())
                         .sequence(planetRequest.getSequence())
                         .build()
         );
@@ -48,7 +48,7 @@ public class PlanetServiceImpl implements PlanetService {
         return PlanetResponse.builder()
                 .id(planet.getId())
                 .name(planet.getName())
-                .story_telling(planet.getStory_telling())
+                .story_telling(planet.getStorytelling())
                 .sequence(planet.getSequence())
                 .build();
 
@@ -63,7 +63,7 @@ public class PlanetServiceImpl implements PlanetService {
         return PlanetResponse.builder()
                 .id(planet.getId())
                 .name(planet.getName())
-                .story_telling(planet.getStory_telling())
+                .story_telling(planet.getStorytelling())
                 .sequence(planet.getSequence())
                 .build();
     }
@@ -74,7 +74,7 @@ public class PlanetServiceImpl implements PlanetService {
                 new ApiException(HttpStatus.NOT_FOUND,"Planet tidak ditemukan"));
 
         planet.setName(planetRequest.getName());
-        planet.setStory_telling(planetRequest.getStory_telling());
+        planet.setStorytelling(planetRequest.getStory_telling());
         planet.setSequence(planetRequest.getSequence());
 
         Planet planetResult = planetRepository.save(planet);
@@ -82,7 +82,7 @@ public class PlanetServiceImpl implements PlanetService {
         return PlanetResponse.builder()
                 .id(planetResult.getId())
                 .name(planetResult.getName())
-                .story_telling(planetResult.getStory_telling())
+                .story_telling(planetResult.getStorytelling())
                 .sequence(planetResult.getSequence())
                 .build();
     }
