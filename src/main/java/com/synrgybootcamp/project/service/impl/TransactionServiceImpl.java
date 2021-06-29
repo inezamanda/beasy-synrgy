@@ -35,7 +35,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
         List<TransactionType> transactionTypes = Arrays.asList(TransactionType.PAYMENT_MERCHANT, TransactionType.PAYMENT_MOBILE, TransactionType.PAYMENT_CREDIT_CARD);
-        List<Transaction> transactions = transactionRepository.findByUserAndTypeIn(user, transactionTypes);
+        List<Transaction> transactions = transactionRepository.findByUserAndTypeInOrderByDateDesc(user, transactionTypes);
         return transactions
                 .stream()
                 .limit(5)
