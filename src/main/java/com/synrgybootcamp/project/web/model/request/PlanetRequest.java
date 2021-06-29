@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
@@ -11,6 +12,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PlanetRequest {
     String name;
-    String story_telling;
+
+    MultipartFile image;
+
     Integer sequence;
+
+    String storyTelling;
+
+    String wording;
 }
