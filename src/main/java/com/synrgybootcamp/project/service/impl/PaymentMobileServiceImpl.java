@@ -62,7 +62,11 @@ public class PaymentMobileServiceImpl implements PaymentMobileService {
         if(!(mobilePaymentRequest.getPin().equals(user.getPin())))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Wrong pin");
 
-        Integer finalBalance = pocket.getBalance() - paymentMobile.getPrice();
+        if(phoneNumberChecker.numberChecker(mobilePaymentRequest.getPhoneNumber()) != paymentMobile.getMobileOperator()) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "You order is not match with you mobile operator");
+        }
+
+        int finalBalance = pocket.getBalance() - paymentMobile.getPrice();
         if (finalBalance < 0)
             throw new ApiException(HttpStatus.BAD_REQUEST, "Jumlah melebihi saldo");
 
@@ -75,7 +79,7 @@ public class PaymentMobileServiceImpl implements PaymentMobileService {
                 Transaction
                         .builder()
                         .user(user)
-                        .description(paymentMobile.getDescription())
+                        .description(paymentMobile.getName())
                         .type(TransactionType.PAYMENT_MOBILE)
                         .totalAmount(paymentMobile.getPrice())
                         .date(date)
@@ -96,7 +100,7 @@ public class PaymentMobileServiceImpl implements PaymentMobileService {
     @Override
     public List<MobileCreditResponse> getDenomList(MobileRequest mobileRequest) {
         List<PaymentMobile> denoms = paymentMobileRepository
-                .findByMobileOperatorAndMobileType(phoneNumberChecker
+                .findByMobileOperatorAndMobileTypeOrderByPriceAsc(phoneNumberChecker
                         .numberChecker(mobileRequest.getPhoneNumber()), MobileType.CREDIT);
 
         return denoms.stream()
@@ -112,7 +116,7 @@ public class PaymentMobileServiceImpl implements PaymentMobileService {
     @Override
     public List<MobileDataResponse> getDataList(MobileRequest mobileRequest) {
         List<PaymentMobile> datas = paymentMobileRepository
-                .findByMobileOperatorAndMobileType(phoneNumberChecker
+                .findByMobileOperatorAndMobileTypeOrderByPriceAsc(phoneNumberChecker
                         .numberChecker(mobileRequest.getPhoneNumber()), MobileType.DATA);
 
         return datas.stream()

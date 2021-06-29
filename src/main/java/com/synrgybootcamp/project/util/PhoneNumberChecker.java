@@ -17,10 +17,7 @@ public class PhoneNumberChecker {
     private final List<String> SMARTFREN = Arrays.asList("0881", "0882", "0883", "0884", "0885", "0886", "0887", "0888");
 
     public MobileOperator numberChecker(String phoneNumber) {
-        String number = phoneNumber.substring(0,4);
-        if(number.substring(0, 3).equals("+62")){
-            number = number.replaceFirst("\\+62", "0");
-        }
+        String number = codeAreaChecker(phoneNumber);
         if (TELKOMSEL.contains(number)) {
             return MobileOperator.TELKOMSEL;
         } else if (INDOSAT.contains(number)) {
@@ -35,6 +32,15 @@ public class PhoneNumberChecker {
             return MobileOperator.SMARTFREN;
         } else {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Nomor yang anda masukkan salah");
+        }
+    }
+
+    private String codeAreaChecker(String phoneNumber) {
+        if (phoneNumber.startsWith("+62")) {
+            String number = phoneNumber.replaceFirst("\\+62", "0");
+            return number.substring(0,4);
+        } else {
+            return phoneNumber.substring(0,4);
         }
     }
 }
