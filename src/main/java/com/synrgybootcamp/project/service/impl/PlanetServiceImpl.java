@@ -6,6 +6,7 @@ import com.synrgybootcamp.project.repository.PlanetRepository;
 import com.synrgybootcamp.project.security.utility.UserInformation;
 import com.synrgybootcamp.project.service.PlanetService;
 import com.synrgybootcamp.project.util.ApiException;
+import com.synrgybootcamp.project.util.UploadFileUtil;
 import com.synrgybootcamp.project.web.model.request.PlanetRequest;
 import com.synrgybootcamp.project.web.model.response.PlanetResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,37 +22,50 @@ public class PlanetServiceImpl implements PlanetService {
     @Autowired
     private PlanetRepository planetRepository;
 
+    @Autowired
+    UploadFileUtil uploadFileUtil;
 
     @Override
     public List<PlanetResponse> getAllPlanet() {
 
         List<Planet> planets = planetRepository.findAll();
 
-        return planets.stream().map(p -> PlanetResponse.builder()
-                .id(p.getId())
-                .name(p.getName())
-                .story_telling(p.getStorytelling())
-                .sequence(p.getSequence()).build()).collect(Collectors.toList());
+        return planets.stream()
+            .map(planet -> PlanetResponse.builder()
+                .id(planet.getId())
+                .name(planet.getName())
+                .image(planet.getImage())
+                .storyTelling(planet.getStorytelling())
+                .sequence(planet.getSequence())
+                .wording(planet.getWording())
+                .build()).collect(Collectors.toList());
     }
 
     @Override
     public PlanetResponse createPlanet(PlanetRequest planetRequest) {
 
+        String planetImage = uploadFileUtil.upload(planetRequest.getImage());
+
         Planet planet = planetRepository.save(
                 Planet.builder()
-                        .name(planetRequest.getName())
-                        .storytelling(planetRequest.getStory_telling())
-                        .sequence(planetRequest.getSequence())
-                        .build()
+                    .name(planetRequest.getName())
+                    .image(planetImage)
+                    .storytelling(planetRequest.getStoryTelling())
+                    .sequence(planetRequest.getSequence())
+                    .wording(planetRequest.getWording())
+                    .build()
         );
 
-        return PlanetResponse.builder()
-                .id(planet.getId())
-                .name(planet.getName())
-                .story_telling(planet.getStorytelling())
-                .sequence(planet.getSequence())
-                .build();
+        System.out.println(planetRequest);
 
+        return PlanetResponse.builder()
+            .id(planet.getId())
+            .name(planet.getName())
+            .image(planet.getImage())
+            .storyTelling(planet.getStorytelling())
+            .sequence(planet.getSequence())
+            .wording(planet.getWording())
+            .build();
     }
 
     @Override
@@ -61,11 +75,13 @@ public class PlanetServiceImpl implements PlanetService {
 
 
         return PlanetResponse.builder()
-                .id(planet.getId())
-                .name(planet.getName())
-                .story_telling(planet.getStorytelling())
-                .sequence(planet.getSequence())
-                .build();
+            .id(planet.getId())
+            .name(planet.getName())
+            .image(planet.getImage())
+            .storyTelling(planet.getStorytelling())
+            .sequence(planet.getSequence())
+            .wording(planet.getWording())
+            .build();
     }
 
     @Override
@@ -73,18 +89,24 @@ public class PlanetServiceImpl implements PlanetService {
         Planet planet = planetRepository.findById(id).orElseThrow(()->
                 new ApiException(HttpStatus.NOT_FOUND,"Planet tidak ditemukan"));
 
+        String planetImage = uploadFileUtil.upload(planetRequest.getImage());
+
         planet.setName(planetRequest.getName());
-        planet.setStorytelling(planetRequest.getStory_telling());
+        planet.setStorytelling(planetRequest.getStoryTelling());
         planet.setSequence(planetRequest.getSequence());
+        planet.setImage(planetImage);
+        planet.setWording(planetRequest.getWording());
 
         Planet planetResult = planetRepository.save(planet);
 
         return PlanetResponse.builder()
-                .id(planetResult.getId())
-                .name(planetResult.getName())
-                .story_telling(planetResult.getStorytelling())
-                .sequence(planetResult.getSequence())
-                .build();
+            .id(planetResult.getId())
+            .name(planetResult.getName())
+            .image(planetResult.getImage())
+            .storyTelling(planetResult.getStorytelling())
+            .sequence(planetResult.getSequence())
+            .wording(planetResult.getWording())
+            .build();
     }
 
     @Override

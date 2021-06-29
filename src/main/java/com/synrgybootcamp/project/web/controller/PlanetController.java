@@ -1,12 +1,8 @@
 package com.synrgybootcamp.project.web.controller;
 
-
-import com.synrgybootcamp.project.repository.PlanetRepository;
 import com.synrgybootcamp.project.service.impl.PlanetServiceImpl;
 import com.synrgybootcamp.project.util.ApiResponse;
-import com.synrgybootcamp.project.web.model.request.ContactRequest;
 import com.synrgybootcamp.project.web.model.request.PlanetRequest;
-import com.synrgybootcamp.project.web.model.response.ContactResponse;
 import com.synrgybootcamp.project.web.model.response.PlanetResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,7 +37,7 @@ public class PlanetController {
     }
 
     @PostMapping("")
-    public ResponseEntity<ApiResponse> addPlanet(@RequestBody PlanetRequest planetRequest){
+    public ResponseEntity<ApiResponse> addPlanet(@ModelAttribute PlanetRequest planetRequest){
         PlanetResponse planetResponse = planetService.createPlanet(planetRequest);
         return new ResponseEntity<>(
                 new ApiResponse("success add new planet", planetResponse), HttpStatus.CREATED
