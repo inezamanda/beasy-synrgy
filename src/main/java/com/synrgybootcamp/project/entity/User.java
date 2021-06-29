@@ -98,6 +98,10 @@ public class User {
     @JoinColumn(name = "user_id")
     private List<UserMission> userMissions;
 
+    @OneToMany
+    @JoinColumn(name = "user_id")
+    private List<CreditCardBill> creditCardBills;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
