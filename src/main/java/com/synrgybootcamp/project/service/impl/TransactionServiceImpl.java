@@ -34,7 +34,8 @@ public class TransactionServiceImpl implements TransactionService {
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
-        List<Transaction> transactions = transactionRepository.findByUserAndTypeOrTypeOrType(user, TransactionType.PAYMENT_CREDIT_CARD, TransactionType.PAYMENT_MOBILE, TransactionType.PAYMENT_MERCHANT);
+        List<TransactionType> transactionTypes = Arrays.asList(TransactionType.PAYMENT_MERCHANT, TransactionType.PAYMENT_MOBILE, TransactionType.PAYMENT_CREDIT_CARD);
+        List<Transaction> transactions = transactionRepository.findByUserAndTypeIn(user, transactionTypes);
         return transactions
                 .stream()
                 .map(transaction -> RecentTransactionResponse
