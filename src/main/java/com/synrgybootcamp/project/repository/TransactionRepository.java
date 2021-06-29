@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<Transaction, String> {
     List<Transaction> findByUserAndTypeOrderByDateDesc(User user, TransactionType transactionType);
+    List<Transaction> findByUserAndTypeOrTypeOrType(User user, TransactionType creditCard, TransactionType mobile, TransactionType merchant);
 }
