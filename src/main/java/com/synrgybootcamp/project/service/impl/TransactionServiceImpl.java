@@ -38,6 +38,7 @@ public class TransactionServiceImpl implements TransactionService {
         List<Transaction> transactions = transactionRepository.findByUserAndTypeIn(user, transactionTypes);
         return transactions
                 .stream()
+                .limit(5)
                 .map(transaction -> RecentTransactionResponse
                 .builder()
                         .id(transaction.getId())
