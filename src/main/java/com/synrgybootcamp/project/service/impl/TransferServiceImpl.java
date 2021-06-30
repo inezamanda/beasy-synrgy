@@ -5,6 +5,8 @@ import com.synrgybootcamp.project.entity.*;
 import com.synrgybootcamp.project.enums.PocketAction;
 import com.synrgybootcamp.project.enums.TransactionType;
 import com.synrgybootcamp.project.enums.TransferStatus;
+import com.synrgybootcamp.project.helper.GamificationHelper;
+import com.synrgybootcamp.project.helper.GamificationMissionHelper;
 import com.synrgybootcamp.project.repository.*;
 import com.synrgybootcamp.project.security.utility.UserInformation;
 import com.synrgybootcamp.project.service.TransferService;
@@ -38,6 +40,9 @@ public class TransferServiceImpl implements TransferService {
 
     @Autowired
     TransactionRepository transactionRepository;
+
+    @Autowired
+    GamificationMissionHelper missionHelper;
 
     @Override
     @Transactional
@@ -94,6 +99,10 @@ public class TransferServiceImpl implements TransferService {
                         .transaction(transaction)
                         .build()
         );
+
+        if (!contact.getBank().getPrimary()) {
+            missionHelper.checkAndValidateTransferMission();
+        }
 
         return TransferResponse
                 .builder()

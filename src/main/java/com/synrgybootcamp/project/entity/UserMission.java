@@ -1,6 +1,5 @@
 package com.synrgybootcamp.project.entity;
 
-import com.synrgybootcamp.project.enums.MissionProgress;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,9 +22,8 @@ public class UserMission {
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String id;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "progress")
-    private MissionProgress progress;
+    private Integer progress;
 
     @Column(name = "is_passed")
     private Boolean passed;

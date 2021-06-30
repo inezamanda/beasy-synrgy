@@ -6,6 +6,7 @@ import com.synrgybootcamp.project.entity.Transaction;
 import com.synrgybootcamp.project.entity.User;
 import com.synrgybootcamp.project.enums.MobileType;
 import com.synrgybootcamp.project.enums.TransactionType;
+import com.synrgybootcamp.project.helper.GamificationMissionHelper;
 import com.synrgybootcamp.project.repository.PaymentMobileRepository;
 import com.synrgybootcamp.project.repository.PocketRepository;
 import com.synrgybootcamp.project.repository.TransactionRepository;
@@ -48,6 +49,9 @@ public class PaymentMobileServiceImpl implements PaymentMobileService {
     @Autowired
     private PhoneNumberChecker phoneNumberChecker;
 
+    @Autowired
+    private GamificationMissionHelper missionHelper;
+
     @Override
     public MobilePaymentResponse payMobile(MobilePaymentRequest mobilePaymentRequest) {
         User user = userRepository.findById(userInformation.getUserID())
@@ -85,6 +89,8 @@ public class PaymentMobileServiceImpl implements PaymentMobileService {
                         .date(date)
                         .build()
         );
+
+        missionHelper.checkAndValidatePaymentMobileMission(transaction.getTotalAmount());
 
         return MobilePaymentResponse
                 .builder()

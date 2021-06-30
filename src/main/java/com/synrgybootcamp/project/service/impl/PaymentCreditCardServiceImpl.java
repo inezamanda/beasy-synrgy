@@ -5,6 +5,7 @@ import com.synrgybootcamp.project.entity.Pocket;
 import com.synrgybootcamp.project.entity.Transaction;
 import com.synrgybootcamp.project.entity.User;
 import com.synrgybootcamp.project.enums.TransactionType;
+import com.synrgybootcamp.project.helper.GamificationMissionHelper;
 import com.synrgybootcamp.project.repository.CreditCardBillRepository;
 import com.synrgybootcamp.project.repository.PocketRepository;
 import com.synrgybootcamp.project.repository.TransactionRepository;
@@ -45,6 +46,9 @@ public class PaymentCreditCardServiceImpl implements PaymentCreditCardService {
 
     @Autowired
     private CreditCardBillUtil creditCardBillUtil;
+
+    @Autowired
+    private GamificationMissionHelper missionHelper;
 
     @Override
     public CreditCardResponse getCreditCardBill(CreditCardRequest creditCardRequest) {
@@ -109,6 +113,8 @@ public class PaymentCreditCardServiceImpl implements PaymentCreditCardService {
                             .date(date)
                             .build()
             );
+
+            missionHelper.checkAndValidateCreditCardMission(transaction.getTotalAmount());
 
             Date nextBillDate = creditCardBill.getDate();
             Calendar calendar = Calendar.getInstance();

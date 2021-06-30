@@ -39,6 +39,6 @@ public class Mission {
     private Planet planet;
 
     @OneToMany
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "mission_id")
     private List<UserMission> userMissions;
 }

@@ -4,6 +4,7 @@ import com.synrgybootcamp.project.entity.Pocket;
 import com.synrgybootcamp.project.entity.Role;
 import com.synrgybootcamp.project.entity.User;
 import com.synrgybootcamp.project.enums.RoleName;
+import com.synrgybootcamp.project.helper.GamificationHelper;
 import com.synrgybootcamp.project.repository.PocketRepository;
 import com.synrgybootcamp.project.repository.RoleRepository;
 import com.synrgybootcamp.project.repository.UserRepository;

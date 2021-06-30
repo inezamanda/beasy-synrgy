@@ -42,4 +42,8 @@ public class UserReward {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "reward_id", referencedColumnName = "id")
+    private RewardPlanet rewardPlanet;
 }

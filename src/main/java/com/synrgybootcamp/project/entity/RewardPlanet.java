@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Builder
@@ -39,4 +40,8 @@ public class RewardPlanet {
     @OneToOne
     @JoinColumn(name = "planet_id", referencedColumnName = "id")
     private Planet planet;
+
+    @OneToMany
+    @JoinColumn(name = "reward_id")
+    private List<UserReward> userRewards;
 }
