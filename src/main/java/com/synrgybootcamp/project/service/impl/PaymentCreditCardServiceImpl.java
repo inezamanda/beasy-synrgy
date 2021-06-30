@@ -51,9 +51,9 @@ public class PaymentCreditCardServiceImpl implements PaymentCreditCardService {
     private GamificationMissionHelper missionHelper;
 
     @Override
-    public CreditCardResponse getCreditCardBill(CreditCardRequest creditCardRequest) {
-        if (!(creditCardBillRepository.existsByCreditCardNumber(creditCardRequest.getCreditcardnumber()))) {
-            CreditCardBill creditCardBill = addBill(creditCardRequest);
+    public CreditCardResponse getCreditCardBill(String creditCardNumber) {
+        if (!(creditCardBillRepository.existsByCreditCardNumber(creditCardNumber))) {
+            CreditCardBill creditCardBill = addBill(creditCardNumber);
             return CreditCardResponse
                     .builder()
                     .name(creditCardBill.getUser().getFullName())
@@ -64,7 +64,7 @@ public class PaymentCreditCardServiceImpl implements PaymentCreditCardService {
                     .on(creditCardBill.getDate())
                     .build();
         } else {
-            CreditCardBill creditCardBill = creditCardBillRepository.findByCreditCardNumber(creditCardRequest.getCreditcardnumber());
+            CreditCardBill creditCardBill = creditCardBillRepository.findByCreditCardNumber(creditCardNumber);
             if(creditCardBill.getPaidOffBill() == true) {
                 throw new ApiException(HttpStatus.NOT_FOUND, "Tagihan Lunas");
             }
@@ -116,14 +116,14 @@ public class PaymentCreditCardServiceImpl implements PaymentCreditCardService {
 
             missionHelper.checkAndValidateCreditCardMission(transaction.getTotalAmount());
 
-            Date nextBillDate = creditCardBill.getDate();
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(nextBillDate);
-            calendar.add(Calendar.MONTH, 1);
-            nextBillDate = calendar.getTime();
-
             int afterSubtraction = creditCardBill.getBillPament() - creditCardPaymentRequest.getAmount();
             if(afterSubtraction != 0) {
+                Date nextBillDate = creditCardBill.getDate();
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(nextBillDate);
+                calendar.add(Calendar.MONTH, 1);
+                nextBillDate = calendar.getTime();
+
                 creditCardBill.setDate(nextBillDate);
                 creditCardBill.setBillPament(afterSubtraction);
                 creditCardBill.setMinimumBill(afterSubtraction * 10 / 100);
@@ -148,7 +148,7 @@ public class PaymentCreditCardServiceImpl implements PaymentCreditCardService {
         }
     }
 
-    private CreditCardBill addBill(CreditCardRequest creditCardRequest) {
+    private CreditCardBill addBill(String creditCardNumber) {
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
@@ -162,13 +162,14 @@ public class PaymentCreditCardServiceImpl implements PaymentCreditCardService {
         return creditCardBillRepository.save(
                 CreditCardBill
                         .builder()
-                        .creditCardNumber(creditCardRequest.getCreditcardnumber())
+                        .creditCardNumber(creditCardNumber)
                         .bank(creditCardBillUtil.getRandomBank())
                         .cardType(creditCardBillUtil.getRandomCardType())
                         .billPament(getBill)
                         .minimumBill(getBill * 10 / 100)
                         .date(date)
                         .user(user)
+                        .paidOffBill(false)
                         .build()
         );
     }

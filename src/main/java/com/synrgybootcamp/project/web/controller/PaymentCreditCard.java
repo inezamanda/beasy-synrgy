@@ -27,9 +27,9 @@ public class PaymentCreditCard {
         );
     }
 
-    @GetMapping("creditcardbill")
-    public ResponseEntity<ApiResponse> getCreditCardBill(@RequestBody CreditCardRequest creditCardRequest) {
-        CreditCardResponse creditCardResponse = paymentCreditCardService.getCreditCardBill(creditCardRequest);
+    @GetMapping("creditcardbill/{creditCardNumber}")
+    public ResponseEntity<ApiResponse> getCreditCardBill(@PathVariable String creditCardNumber) {
+        CreditCardResponse creditCardResponse = paymentCreditCardService.getCreditCardBill(creditCardNumber);
         return new ResponseEntity<>(
                 new ApiResponse("Successfully get the Bill", creditCardResponse)
                 , HttpStatus.OK
