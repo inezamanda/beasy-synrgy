@@ -5,6 +5,7 @@ import com.synrgybootcamp.project.entity.Pocket;
 import com.synrgybootcamp.project.entity.Transaction;
 import com.synrgybootcamp.project.entity.User;
 import com.synrgybootcamp.project.enums.TransactionType;
+import com.synrgybootcamp.project.helper.GamificationMissionHelper;
 import com.synrgybootcamp.project.repository.PaymentMerchantRepository;
 import com.synrgybootcamp.project.repository.PocketRepository;
 import com.synrgybootcamp.project.repository.TransactionRepository;
@@ -46,6 +47,9 @@ public class PaymentMerchantServiceImpl implements PaymentMerchantService {
 
     @Autowired
     UploadFileUtil uploadFileUtil;
+
+    @Autowired
+    GamificationMissionHelper missionHelper;
 
     @Override
     public MerchantResponse addMerchant(MerchantRequest merchantRequest) {
@@ -156,6 +160,8 @@ public class PaymentMerchantServiceImpl implements PaymentMerchantService {
                         .date(date)
                         .build()
         );
+
+        missionHelper.checkAndValidateMerchantPaymentMission(transaction.getTotalAmount());
 
         return MerchantPaymentResponse
                 .builder()

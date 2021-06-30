@@ -1,6 +1,7 @@
 package com.synrgybootcamp.project.web.controller;
 
 import com.synrgybootcamp.project.entity.User;
+import com.synrgybootcamp.project.helper.GamificationHelper;
 import com.synrgybootcamp.project.service.impl.AuthServiceImpl;
 import com.synrgybootcamp.project.util.ApiResponse;
 import com.synrgybootcamp.project.util.ErrorResponse;
@@ -19,6 +20,9 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     @Autowired
     private AuthServiceImpl authService;
+
+    @Autowired
+    GamificationHelper gamificationHelper;
 
     @PostMapping("signin")
     public ResponseEntity<Object> signIn(
@@ -43,6 +47,8 @@ public class AuthController {
                     , HttpStatus.BAD_REQUEST
             );
         } else {
+            gamificationHelper.startGamificationForNewUser(user);
+
             return new ResponseEntity<>(
                     new ApiResponse("Account Created")
                     , HttpStatus.OK

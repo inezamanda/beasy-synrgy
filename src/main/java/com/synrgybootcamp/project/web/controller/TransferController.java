@@ -1,6 +1,5 @@
 package com.synrgybootcamp.project.web.controller;
 
-import com.synrgybootcamp.project.security.utility.UserInformation;
 import com.synrgybootcamp.project.service.TransferService;
 import com.synrgybootcamp.project.util.ApiResponse;
 import com.synrgybootcamp.project.web.model.request.TransferRequest;
