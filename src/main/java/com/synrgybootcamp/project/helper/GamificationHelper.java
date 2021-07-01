@@ -230,7 +230,7 @@ public class GamificationHelper {
     addPlanetMissionToUser(nextPlalanet);
   }
 
-  private void addPlanetMissionToUser(Planet planet) {
+  public void addPlanetMissionToUser(Planet planet) {
     List<UserMission> userMissions = Optional.of(planet)
         .map(Planet::getMissions)
         .map(data -> data.stream()
