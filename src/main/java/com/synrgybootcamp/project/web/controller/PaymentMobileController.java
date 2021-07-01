@@ -36,22 +36,22 @@ public class PaymentMobileController {
         );
     }
 
-    @GetMapping("/mobilecredit")
+    @GetMapping("/mobilecredit/{phoneNumber}")
     @ApiOperation(value = "Get list of mobile credit")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> getMobileCreditList(@RequestBody MobileRequest mobileRequest) {
-        List<MobileCreditResponse> denom = mobileService.getDenomList(mobileRequest);
+    public ResponseEntity<ApiResponse> getMobileCreditList(@PathVariable String phoneNumber) {
+        List<MobileCreditResponse> denom = mobileService.getDenomList(phoneNumber);
         return new ResponseEntity<>(
                 new ApiResponse("Successfully get mobile credit list", denom)
                 , HttpStatus.OK
         );
     }
 
-    @GetMapping("/mobiledata")
+    @GetMapping("/mobiledata/{phoneNumber}")
     @ApiOperation(value = "Get list of mobile data")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> getMobileDataList(@RequestBody MobileRequest mobileRequest) {
-        List<MobileDataResponse> data = mobileService.getDataList(mobileRequest);
+    public ResponseEntity<ApiResponse> getMobileDataList(@PathVariable String phoneNumber) {
+        List<MobileDataResponse> data = mobileService.getDataList(phoneNumber);
         return new ResponseEntity<>(
                 new ApiResponse("Successfully get mobile data list", data)
                 , HttpStatus.OK
