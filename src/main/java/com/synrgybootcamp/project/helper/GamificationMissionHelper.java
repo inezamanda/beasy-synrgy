@@ -1,8 +1,12 @@
 package com.synrgybootcamp.project.helper;
 
 import com.synrgybootcamp.project.entity.Mission;
+import com.synrgybootcamp.project.entity.Planet;
 import com.synrgybootcamp.project.entity.Pocket;
+import com.synrgybootcamp.project.entity.RewardPlanet;
+import com.synrgybootcamp.project.entity.User;
 import com.synrgybootcamp.project.entity.UserMission;
+import com.synrgybootcamp.project.entity.UserReward;
 import com.synrgybootcamp.project.enums.MissionType;
 import com.synrgybootcamp.project.repository.MissionRepository;
 import com.synrgybootcamp.project.repository.PlanetRepository;
@@ -147,6 +151,27 @@ public class GamificationMissionHelper extends GamificationHelper {
             super.userMissionRepository.save(res);
 
             log.info("credit card mission passed on user " + getUser().getFullName());
+          }
+        });
+
+    checkForPlanetCompletion();
+  }
+
+  public void checkAndValidateWalletMission(Integer paymentAmount) {
+    if (!super.isReadyToStartMission()) return;
+
+    UserMission userMission = checkIsUserHaveMission(MissionType.WALLET_TRANSACTION);
+
+    Optional.ofNullable(userMission)
+        .ifPresent(res -> {
+          log.info("wallet mission on user " + getUser().getFullName() + " found, validating progress");
+
+          int missionTarget = res.getMission().getTarget();
+          if (paymentAmount >= missionTarget) {
+            res.setPassed(true);
+            super.userMissionRepository.save(res);
+
+            log.info("wallet mission passed on user " + getUser().getFullName());
           }
         });
 

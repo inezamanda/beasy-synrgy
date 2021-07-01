@@ -4,6 +4,7 @@ import com.synrgybootcamp.project.constant.TransactionConstants;
 import com.synrgybootcamp.project.entity.*;
 import com.synrgybootcamp.project.enums.EwalletStatus;
 import com.synrgybootcamp.project.enums.TransactionType;
+import com.synrgybootcamp.project.helper.GamificationMissionHelper;
 import com.synrgybootcamp.project.repository.*;
 import com.synrgybootcamp.project.security.utility.UserInformation;
 import com.synrgybootcamp.project.service.EwalletTransactionService;
@@ -37,6 +38,9 @@ public class EwalletTransactionServiceImpl implements EwalletTransactionService 
 
     @Autowired
     TransactionRepository transactionRepository;
+    
+    @Autowired
+    GamificationMissionHelper missionHelper;
 
     @Override
     @Transactional
@@ -87,6 +91,8 @@ public class EwalletTransactionServiceImpl implements EwalletTransactionService 
                         .transaction(transaction)
                         .build()
         );
+
+        missionHelper.checkAndValidateWalletMission(ewalletTransaction.getAmount());
 
         return EwalletTransactionResponse
                 .builder()
