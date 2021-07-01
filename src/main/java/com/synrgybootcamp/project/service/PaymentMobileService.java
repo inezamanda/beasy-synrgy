@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface PaymentMobileService {
     MobilePaymentResponse payMobile(MobilePaymentRequest mobilePaymentRequest);
-    List<MobileCreditResponse> getDenomList(MobileRequest mobileRequest);
-    List<MobileDataResponse> getDataList(MobileRequest mobileRequest);
+    List<MobileCreditResponse> getDenomList(String phoneNumber);
+    List<MobileDataResponse> getDataList(String phoneNumber);
 }

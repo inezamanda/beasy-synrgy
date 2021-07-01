@@ -104,10 +104,10 @@ public class PaymentMobileServiceImpl implements PaymentMobileService {
     }
 
     @Override
-    public List<MobileCreditResponse> getDenomList(MobileRequest mobileRequest) {
+    public List<MobileCreditResponse> getDenomList(String phoneNumber) {
         List<PaymentMobile> denoms = paymentMobileRepository
                 .findByMobileOperatorAndMobileTypeOrderByPriceAsc(phoneNumberChecker
-                        .numberChecker(mobileRequest.getPhoneNumber()), MobileType.CREDIT);
+                        .numberChecker(phoneNumber), MobileType.CREDIT);
 
         return denoms.stream()
                 .map(denom -> MobileCreditResponse
@@ -120,10 +120,10 @@ public class PaymentMobileServiceImpl implements PaymentMobileService {
     }
 
     @Override
-    public List<MobileDataResponse> getDataList(MobileRequest mobileRequest) {
+    public List<MobileDataResponse> getDataList(String phoneNumber) {
         List<PaymentMobile> datas = paymentMobileRepository
                 .findByMobileOperatorAndMobileTypeOrderByPriceAsc(phoneNumberChecker
-                        .numberChecker(mobileRequest.getPhoneNumber()), MobileType.DATA);
+                        .numberChecker(phoneNumber), MobileType.DATA);
 
         return datas.stream()
                 .map(data -> MobileDataResponse
