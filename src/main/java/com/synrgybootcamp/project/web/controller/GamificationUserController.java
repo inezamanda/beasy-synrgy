@@ -14,12 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
+@Api(tags = "User Gamification", description = "User Controller for Gamification")
 public class GamificationUserController {
 
   @Autowired
   GamificationUserService gamificationUserService;
 
-  @GetMapping("api/gamification/start")
+  @PostMapping("api/gamification/start")
   @ApiOperation(value = "start gamification for user who doesnt started gamification yet")
   @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
   public ResponseEntity<ApiResponse> startGamification() {
