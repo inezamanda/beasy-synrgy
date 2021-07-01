@@ -5,9 +5,11 @@ import com.synrgybootcamp.project.util.ErrorResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import springfox.documentation.annotations.ApiIgnore;
 
 
 @ControllerAdvice
+@ApiIgnore
 public class ErrorController {
 
     @ExceptionHandler(value = ApiException.class)

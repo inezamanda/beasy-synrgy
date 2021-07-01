@@ -4,6 +4,8 @@ import com.synrgybootcamp.project.service.impl.ContactServiceImpl;
 import com.synrgybootcamp.project.util.ApiResponse;
 import com.synrgybootcamp.project.web.model.request.ContactRequest;
 import com.synrgybootcamp.project.web.model.response.ContactResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +16,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/contacts")
+@Api(tags = "Contact", description = "Contact Controller")
 public class ContactController {
     @Autowired
     ContactServiceImpl contactService;
 
     @GetMapping
+    @ApiOperation(value = "Get list of contact")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> listContact(
             @RequestParam(required = false) String keyword
     ) {
@@ -29,6 +34,8 @@ public class ContactController {
     }
 
     @GetMapping("/recent")
+    @ApiOperation(value = "Get list of recent contact")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> recentContacts(){
         List<ContactResponse> contacts = contactService.recentContacts();
         return new ResponseEntity<>(

@@ -10,13 +10,17 @@ import com.synrgybootcamp.project.web.model.request.ForgotPasswordRequest;
 import com.synrgybootcamp.project.web.model.request.SignInRequest;
 import com.synrgybootcamp.project.web.model.request.SignUpRequest;
 import com.synrgybootcamp.project.web.model.response.SignInResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/auth")
+@Api(tags = "Authentication", description = "Authentication Controller")
 public class AuthController {
     @Autowired
     private AuthServiceImpl authService;
@@ -25,6 +29,7 @@ public class AuthController {
     GamificationHelper gamificationHelper;
 
     @PostMapping("signin")
+    @ApiOperation(value = "Sign In User")
     public ResponseEntity<Object> signIn(
             @RequestBody SignInRequest signInRequest
     ) {
@@ -37,6 +42,8 @@ public class AuthController {
     }
 
     @PostMapping("signup")
+    @ApiOperation(value = "Sign Up User (Admin Only)")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> signUp(
             @RequestBody SignUpRequest signUpRequest
     ) {
@@ -57,6 +64,7 @@ public class AuthController {
     }
 
     @PostMapping("forgot-password")
+    @ApiOperation(value = "Request change password for user")
     public ResponseEntity<Object> forgotPassword(
             @RequestBody ForgotPasswordRequest forgotPasswordRequest
     ) {
@@ -66,6 +74,7 @@ public class AuthController {
     }
 
     @PostMapping("change-password/{token}")
+    @ApiOperation(value = "Check token validity and change user password")
     public ResponseEntity<Object> changePassword(
             @PathVariable String token,
             @RequestBody ChangePasswordRequest changePasswordRequest
