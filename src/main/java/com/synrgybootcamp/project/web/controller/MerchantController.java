@@ -5,15 +5,19 @@ import com.synrgybootcamp.project.util.ApiResponse;
 import com.synrgybootcamp.project.util.UploadFileUtil;
 import com.synrgybootcamp.project.web.model.request.MerchantRequest;
 import com.synrgybootcamp.project.web.model.response.MerchantResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("api/merchant")
+@Api(tags = "Merchant", description = "Merchant Controller")
 public class MerchantController {
 
     @Autowired
@@ -23,6 +27,8 @@ public class MerchantController {
     UploadFileUtil uploadFileUtil;
 
     @GetMapping("")
+    @ApiOperation(value = "Get list of merchant (Admin Only)")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> listMerchant() {
         List<MerchantResponse> merchantResponses  = merchantService.getAllMerchants();
         return new ResponseEntity<>(
@@ -31,6 +37,8 @@ public class MerchantController {
     }
 
     @GetMapping("/{id}")
+    @ApiOperation(value = "Get detail of merchant")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> getMerchantById(
             @PathVariable String id){
         MerchantResponse merchantResponse = merchantService.getMerchantById(id);
@@ -41,6 +49,8 @@ public class MerchantController {
     }
 
     @PostMapping("")
+    @ApiOperation(value = "Add new merchant (Admin Only)")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> addMerchant(@ModelAttribute MerchantRequest merchantRequest){
         MerchantResponse merchantResponse = merchantService.addMerchant(merchantRequest);
 
@@ -50,6 +60,8 @@ public class MerchantController {
     }
 
     @PutMapping("/{id}")
+    @ApiOperation(value = "Edit merchant (Admin Only)")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> updateMerchantById(
             @PathVariable String id,
             @ModelAttribute MerchantRequest merchantRequest){
@@ -61,6 +73,8 @@ public class MerchantController {
     }
 
     @DeleteMapping("/{id}")
+    @ApiOperation(value = "Delete merchant (Admin Only)")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> deleteMerchantById(@PathVariable String id){
         boolean deleted = merchantService.deleteMerchantById(id);
 

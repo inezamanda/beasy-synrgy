@@ -11,16 +11,20 @@ import com.synrgybootcamp.project.web.model.response.MovePocketBalanceResponse;
 import com.synrgybootcamp.project.web.model.response.PocketResponse;
 import com.synrgybootcamp.project.web.model.response.PocketTransactionResponse;
 import com.synrgybootcamp.project.web.model.response.TopUpPocketBalanceResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("api/pocket")
+@Api(tags = "Pocket", description = "Pocket Controller")
 public class PocketController {
     @Autowired
     private PocketServiceImpl pocketService;
@@ -32,6 +36,8 @@ public class PocketController {
     UploadFileUtil uploadFileUtil;
 
     @GetMapping("")
+    @ApiOperation(value = "Get list of pockets")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> getAllPockets(){
 
         List<PocketResponse> pocketResponse = pocketService.getAllPocket();
@@ -43,6 +49,8 @@ public class PocketController {
     }
 
     @PostMapping("")
+    @ApiOperation(value = "Create new pocket")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> createPocket(
             @ModelAttribute PocketRequest pocketRequest
     ){
@@ -55,6 +63,8 @@ public class PocketController {
     }
 
     @GetMapping("/{id}")
+    @ApiOperation(value = "Get detail of pocket")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> getPocketsByID(@PathVariable String id){
         PocketResponse detailPocket = pocketService.getDetailPocketByID(id);
 
@@ -65,6 +75,8 @@ public class PocketController {
     }
 
     @GetMapping("/{id}/history")
+    @ApiOperation(value = "Get history of pocket")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> getHistoryPockets(
             @PathVariable String id,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -83,6 +95,8 @@ public class PocketController {
     }
 
     @DeleteMapping("/{id}")
+    @ApiOperation(value = "Delete pocket")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> deletePocketsByID(@PathVariable String id){
        boolean pocketDelete = pocketService.deletePocketById(id);
 
