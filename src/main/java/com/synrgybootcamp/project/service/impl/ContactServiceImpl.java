@@ -126,9 +126,7 @@ public class ContactServiceImpl implements ContactService {
         Contact contact = contactRepository.findById(id)
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "Contact tidak ditemukan"));
 
-        return contact == null
-                ? null
-                : ContactResponse
+        return ContactResponse
                 .builder()
                 .id(contact.getId())
                 .name(contact.getName())
