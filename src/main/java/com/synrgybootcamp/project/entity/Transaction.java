@@ -45,4 +45,7 @@ public class Transaction {
 
     @OneToOne(mappedBy = "transaction")
     private Transfer transfer;
+
+    @OneToOne(mappedBy = "transaction")
+    private EwalletTransaction ewalletTransaction;
 }
