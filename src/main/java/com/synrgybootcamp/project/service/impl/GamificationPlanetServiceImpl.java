@@ -63,7 +63,7 @@ public class GamificationPlanetServiceImpl implements GamificationPlanetService 
         .image(planet.getImage())
         .storytelling(planet.getStorytelling())
         .wording(planet.getWording())
-        .rewardId(planet.getRewardPlanet().getId())
+        .rewardId(Optional.ofNullable(planet).map(Planet::getRewardPlanet).map(RewardPlanet::getId).orElse(null))
         .status(gamificationHelper.getPlanetStatus(planet.getSequence()))
         .mission(gamificationHelper.getUserMissionStatus(planet))
         .build();
