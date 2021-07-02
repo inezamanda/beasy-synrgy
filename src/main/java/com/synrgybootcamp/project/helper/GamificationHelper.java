@@ -201,16 +201,11 @@ public class GamificationHelper {
         .claimed(false)
         .expired(false)
         .totalUsed(0)
-        .expiredAt(generateRewardExpirationTime())
         .build();
 
     userRewardRepository.save(userReward);
 
     log.info("added reward " + currentPlanetReward.getWording() + " to user " + getUser().getFullName());
-  }
-
-  private Date generateRewardExpirationTime() {
-    return DateUtils.addMonths(new Date(), 1);
   }
 
   private void changeToNextPlanet() {

@@ -43,7 +43,13 @@ public class UserReward {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
+    @Column(name = "user_id", insertable = false, updatable = false)
+    private String userId;
+
     @ManyToOne
     @JoinColumn(name = "reward_id", referencedColumnName = "id")
     private RewardPlanet rewardPlanet;
+
+    @Column(name = "reward_id", insertable = false, updatable = false)
+    private String rewardId;
 }

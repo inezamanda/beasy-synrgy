@@ -2,7 +2,9 @@ package com.synrgybootcamp.project.web.controller;
 
 import com.synrgybootcamp.project.enums.PlanetStatus;
 import com.synrgybootcamp.project.service.GamificationPlanetService;
+import com.synrgybootcamp.project.service.impl.GamificationPlanetRewardServiceImpl;
 import com.synrgybootcamp.project.util.ApiResponse;
+import com.synrgybootcamp.project.web.model.response.GamificationRewardPlanetResponse;
 import com.synrgybootcamp.project.web.model.response.ListPlanetResponse;
 import com.synrgybootcamp.project.web.model.response.PlanetDetailResponse;
 import io.swagger.annotations.Api;
@@ -27,6 +29,9 @@ public class GamificationPlanetController {
   @Autowired
   private GamificationPlanetService gamificationPlanetService;
 
+  @Autowired
+  private GamificationPlanetRewardServiceImpl gamificationPlanetRewardService;
+
   @GetMapping("")
   @ApiOperation(value = "Get list of planets")
   @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
@@ -50,6 +55,16 @@ public class GamificationPlanetController {
 
     return new ResponseEntity<>(
         new ApiResponse("success get planet detail", planet), HttpStatus.OK
+    );
+  }
+
+  @GetMapping("/{planetId}/reward")
+  @ApiOperation(value = "Get reward of planet")
+  public ResponseEntity<ApiResponse> getRewardPlanetById(@PathVariable String planetId) {
+    GamificationRewardPlanetResponse gamificationRewardPlanetResponse = gamificationPlanetRewardService.getPlanetRewardById(planetId);
+
+    return new ResponseEntity<>(
+        new ApiResponse("Successfully get planet reward", gamificationRewardPlanetResponse), HttpStatus.OK
     );
   }
 
