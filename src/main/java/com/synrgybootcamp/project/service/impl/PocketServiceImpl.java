@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -94,12 +95,14 @@ public class PocketServiceImpl implements PocketService {
         Pocket pocket = pocketRepository.findById(id).orElseThrow(()->
                 new ApiException(HttpStatus.NOT_FOUND,"Pocket tidak ditemukan"));
 
-        String uploadFile = uploadFileUtil.upload(pocketRequest.getPicture());
+        if (Objects.nonNull(pocketRequest.getPicture())) {
+            String uploadFile = uploadFileUtil.upload(pocketRequest.getPicture());
+            pocket.setPicture(uploadFile);
+        }
 
         pocket.setName(pocketRequest.getName());
         pocket.setDueDate(pocketRequest.getDueDate());
         pocket.setTarget(pocketRequest.getTarget());
-        pocket.setPicture(uploadFile);
 
         Pocket pocketResult = pocketRepository.save(pocket);
 
