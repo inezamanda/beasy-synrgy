@@ -179,7 +179,7 @@ public class GamificationHelper {
         .findFirst()
         .orElse(null);
 
-    return userMission.getPassed();
+    return Optional.ofNullable(userMission).map(UserMission::getPassed).orElse(false);
   }
 
   private UserMission fetchOnlyFinishedMission(Mission mission) {
