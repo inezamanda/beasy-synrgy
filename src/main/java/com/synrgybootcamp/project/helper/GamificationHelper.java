@@ -20,7 +20,9 @@ import com.synrgybootcamp.project.web.model.response.UserGamificationStatusRespo
 import com.synrgybootcamp.project.web.model.response.sub.MissionObjResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateUtils;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.context.annotation.RequestScope;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,13 +61,11 @@ public class GamificationHelper {
     this.userInformation = userInformation;
   }
 
+  @Bean
+  @RequestScope
   public User getUser() {
-    if (user == null) {
-      user = userRepository.findById(userInformation.getUserID())
-          .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "user not found"));
-    }
-
-    return user;
+    return userRepository.findById(userInformation.getUserID())
+        .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "user not found"));
   }
 
   public void setUser(User user) {
