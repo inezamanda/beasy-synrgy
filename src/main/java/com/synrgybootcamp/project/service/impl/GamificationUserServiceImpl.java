@@ -91,5 +91,6 @@ public class GamificationUserServiceImpl implements GamificationUserService {
         .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
     user.setLastPlanetCompletionTime(null);
+    userRepository.save(user);
   }
 }
