@@ -94,6 +94,10 @@ public class GamificationHelper {
       lastCompletionDelay = DateUtils.addDays(getUser().getLastPlanetCompletionTime(), 1);
     }
 
+    if (Objects.isNull(planet)) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, "You need to start gamification first");
+    }
+
     return UserGamificationStatusResponse.builder()
         .planetId(planet.getId())
         .planetName(planet.getName())
