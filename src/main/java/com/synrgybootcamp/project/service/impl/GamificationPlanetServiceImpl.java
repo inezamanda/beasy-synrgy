@@ -1,6 +1,7 @@
 package com.synrgybootcamp.project.service.impl;
 
 import com.synrgybootcamp.project.entity.Planet;
+import com.synrgybootcamp.project.entity.RewardPlanet;
 import com.synrgybootcamp.project.enums.PlanetStatus;
 import com.synrgybootcamp.project.helper.GamificationHelper;
 import com.synrgybootcamp.project.repository.PlanetRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,7 +40,7 @@ public class GamificationPlanetServiceImpl implements GamificationPlanetService 
             .image(planet.getImage())
             .sequence(planet.getSequence())
             .wording(planet.getWording())
-            .rewardId(planet.getRewardPlanet().getId())
+            .rewardId(Optional.ofNullable(planet).map(Planet::getRewardPlanet).map(RewardPlanet::getId).orElse(null))
             .status(gamificationHelper.getPlanetStatus(planet.getSequence()))
             .build());
 
