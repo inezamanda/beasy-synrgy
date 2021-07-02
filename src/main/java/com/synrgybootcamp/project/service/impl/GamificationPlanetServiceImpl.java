@@ -43,7 +43,7 @@ public class GamificationPlanetServiceImpl implements GamificationPlanetService 
             .build());
 
     if (Objects.nonNull(status)) {
-      mappedPlanetData.filter(planet -> planet.getStatus().equals(status));
+      mappedPlanetData = mappedPlanetData.filter(planet -> planet.getStatus().equals(status));
     }
 
     return mappedPlanetData.collect(Collectors.toList());
