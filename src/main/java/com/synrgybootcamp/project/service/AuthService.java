@@ -10,6 +10,6 @@ import com.synrgybootcamp.project.web.model.response.SignInResponse;
 public interface AuthService {
     SignInResponse signIn(SignInRequest signInRequest);
     User signUp(SignUpRequest signUpRequest);
-    String forgotPassword(ForgotPasswordRequest forgotPasswordRequest);
-    String changePassword(ChangePasswordRequest changePasswordRequest, String token);
+    void forgotPassword(ForgotPasswordRequest forgotPasswordRequest);
+    void changePassword(ChangePasswordRequest changePasswordRequest, String token);
 }

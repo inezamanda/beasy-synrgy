@@ -1,5 +1,6 @@
 package com.synrgybootcamp.project.web.controller;
 
+import com.synrgybootcamp.project.service.BankService;
 import com.synrgybootcamp.project.service.impl.BankServiceImpl;
 import com.synrgybootcamp.project.util.ApiResponse;
 import com.synrgybootcamp.project.web.model.response.BankResponse;
@@ -19,19 +20,16 @@ import java.util.List;
 @RequestMapping("api/bank")
 @Api(tags = "Bank", description = "Bank Controller")
 public class BankController {
+
     @Autowired
-    private BankServiceImpl bankService;
+    private BankService bankService;
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @ApiOperation(value = "Get list of Bank")
-    public ResponseEntity<ApiResponse> getAllItems() {
-        List<BankResponse> pagedBanks = bankService.getAllBanks(
-        );
+    public ApiResponse<List<BankResponse>> getAllItems() {
+        List<BankResponse> pagedBanks = bankService.getAllBanks();
 
-        return new ResponseEntity<>(
-                new ApiResponse("success get banks data", pagedBanks),
-                HttpStatus.OK
-        );
+        return new ApiResponse<>("success get banks data", pagedBanks);
     }
 }

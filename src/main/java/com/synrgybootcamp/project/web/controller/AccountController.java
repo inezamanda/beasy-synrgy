@@ -2,6 +2,7 @@ package com.synrgybootcamp.project.web.controller;
 
 import com.synrgybootcamp.project.service.impl.AccountServiceImpl;
 import com.synrgybootcamp.project.util.ApiResponse;
+import com.synrgybootcamp.project.util.ApiResponseWithoutData;
 import com.synrgybootcamp.project.web.model.request.AccountRequest;
 import com.synrgybootcamp.project.web.model.response.AccountResponse;
 import io.swagger.annotations.Api;
@@ -18,73 +19,66 @@ import java.util.List;
 @RequestMapping("api/accounts")
 @Api(tags = "Accounts", description = "Accounts Controller")
 public class AccountController {
+
     @Autowired
     AccountServiceImpl accountService;
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @ApiOperation(value = "Get list of accounts")
-    public ResponseEntity<ApiResponse> listAccounts(
+    public ApiResponse<List<AccountResponse>> listAccounts(
             @RequestParam(required = false) String keyword
     ) {
         List<AccountResponse> accounts = accountService.getAllAccounts(keyword);
-        return new ResponseEntity<>(
-                new ApiResponse("success get all accounts", accounts), HttpStatus.OK
-        );
+
+        return new ApiResponse<>("success get all accounts", accounts);
     }
 
     @GetMapping("/recent")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @ApiOperation(value = "Get recent account")
-    public ResponseEntity<ApiResponse> recentAccounts(){
+    public ApiResponse<List<AccountResponse>> recentAccounts(){
         List<AccountResponse> accounts = accountService.recentAccounts();
-        return new ResponseEntity<>(
-                new ApiResponse("success get all accounts", accounts), HttpStatus.OK
-        );
+
+        return new ApiResponse<>("success get all accounts", accounts);
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @ApiOperation(value = "Add new account")
-    public ResponseEntity<ApiResponse> addAccount(@RequestBody AccountRequest accountRequest){
+    public ApiResponse<AccountResponse> addAccount(@RequestBody AccountRequest accountRequest){
         AccountResponse account = accountService.createAccount(accountRequest);
-        return new ResponseEntity<>(
-                new ApiResponse("success add new account", account), HttpStatus.CREATED
-        );
+
+        return new ApiResponse<>("success add new account", account);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @ApiOperation(value = "Get detail account")
-    public ResponseEntity<ApiResponse> getAccountById(
+    public ApiResponse<AccountResponse> getAccountById(
             @PathVariable String id){
         AccountResponse detailAccount = accountService.getAccountById(id);
 
-        return new ResponseEntity<>(
-                new ApiResponse("success get detail account", detailAccount), HttpStatus.OK
-        );
+        return new ApiResponse<>("success get detail account", detailAccount);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @ApiOperation(value = "Edit account")
-    public ResponseEntity<ApiResponse> updateAccountById(
+    public ApiResponse<AccountResponse> updateAccountById(
             @PathVariable String id,
             @RequestBody AccountRequest accountRequest){
         AccountResponse account = accountService.updateAccountById(id, accountRequest);
-        return new ResponseEntity<>(
-                new ApiResponse("success edit account", account), HttpStatus.OK
-        );
+
+        return new ApiResponse<>("success edit account", account);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @ApiOperation(value = "Delete Account")
-    public ResponseEntity<ApiResponse> deleteAccountById(@PathVariable String id){
-        boolean deleted = accountService.deleteAccountById(id);
+    public ApiResponseWithoutData deleteAccountById(@PathVariable String id){
+        accountService.deleteAccountById(id);
 
-        return new ResponseEntity<>(
-                new ApiResponse(deleted ? "success delete account" : "account not found"), HttpStatus.OK
-        );
+        return new ApiResponseWithoutData("success delete account");
     }
 }

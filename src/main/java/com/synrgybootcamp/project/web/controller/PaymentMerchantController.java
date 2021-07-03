@@ -26,24 +26,18 @@ public class PaymentMerchantController {
     @PostMapping("")
     @ApiOperation("Pay merchant bill")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> payMerchant(@RequestBody MerchantPaymentRequest merchantPaymentRequest) {
+    public ApiResponse<MerchantPaymentResponse> payMerchant(@RequestBody MerchantPaymentRequest merchantPaymentRequest) {
         MerchantPaymentResponse merchantPaymentResponse = paymentMerchantService.payMerchant(merchantPaymentRequest);
 
-        return new ResponseEntity<>(
-                new ApiResponse("Transaction Success", merchantPaymentResponse)
-                , HttpStatus.OK
-        );
+        return new ApiResponse<>("Transaction Success", merchantPaymentResponse);
     }
 
     @GetMapping("")
     @ApiOperation("Get list of merchants")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> getMerchantList() {
+    public ApiResponse<List<MerchantResponse>> getMerchantList() {
         List<MerchantResponse> merchantResponses = paymentMerchantService.getAllMerchants();
 
-        return new ResponseEntity<>(
-                new ApiResponse("Successfully get merchant list", merchantResponses)
-                , HttpStatus.OK
-        );
+        return new ApiResponse<>("Successfully get merchant list", merchantResponses);
     }
 }

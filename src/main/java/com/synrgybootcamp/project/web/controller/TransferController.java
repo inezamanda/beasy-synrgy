@@ -25,7 +25,7 @@ public class TransferController {
     @PostMapping()
     @ApiOperation(value = "Transfer money from main pocket a.k.a balance")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Object> transfer(@RequestBody TransferRequest transferRequest) {
+    public ApiResponse<TransferResponse> transfer(@RequestBody TransferRequest transferRequest) {
         TransferResponse transferResult = transferService.transfer(
                 TransferRequest
                         .builder()
@@ -36,9 +36,6 @@ public class TransferController {
                         .build()
         );
 
-        return new ResponseEntity<>(
-                new ApiResponse("Transfer success", transferResult)
-                , HttpStatus.OK
-        );
+        return new ApiResponse<>("Transfer success", transferResult);
     }
 }
