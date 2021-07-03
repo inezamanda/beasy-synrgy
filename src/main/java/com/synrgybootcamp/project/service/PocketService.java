@@ -1,5 +1,6 @@
 package com.synrgybootcamp.project.service;
 
+import com.synrgybootcamp.project.enums.PocketTransactionType;
 import com.synrgybootcamp.project.web.model.request.MovePocketBalanceRequest;
 import com.synrgybootcamp.project.web.model.request.PocketRequest;
 import com.synrgybootcamp.project.web.model.request.TopUpPocketBalanceRequest;
@@ -20,7 +21,7 @@ public interface PocketService {
     PocketResponse getDetailPocketByID(String id);
     PocketResponse updatePocketById(String id,PocketRequest pocketRequest);
     boolean deletePocketById(String id);
-    List<PocketTransactionResponse> getHistory(String pocketId, Sort sort);
+    List<PocketTransactionResponse> getHistory(String pocketId, Sort sort, PocketTransactionType type);
     TopUpPocketBalanceResponse topUpBalance(String userId, TopUpPocketBalanceRequest payload);
     MovePocketBalanceResponse moveBalance(MovePocketBalanceRequest payload);
 }
