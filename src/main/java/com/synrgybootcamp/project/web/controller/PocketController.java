@@ -1,7 +1,8 @@
 package com.synrgybootcamp.project.web.controller;
 
+import com.synrgybootcamp.project.enums.PocketTransactionType;
 import com.synrgybootcamp.project.security.utility.UserInformation;
-import com.synrgybootcamp.project.service.impl.PocketServiceImpl;
+import com.synrgybootcamp.project.service.PocketService;
 import com.synrgybootcamp.project.util.ApiResponse;
 import com.synrgybootcamp.project.util.UploadFileUtil;
 import com.synrgybootcamp.project.web.model.request.MovePocketBalanceRequest;
@@ -27,7 +28,7 @@ import java.util.List;
 @Api(tags = "Pocket", description = "Pocket Controller")
 public class PocketController {
     @Autowired
-    private PocketServiceImpl pocketService;
+    private PocketService pocketService;
 
     @Autowired
     private UserInformation userInformation;
@@ -77,14 +78,15 @@ public class PocketController {
     @GetMapping("/{id}/history")
     @ApiOperation(value = "Get history of pocket")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> getHistoryPockets(
-            @PathVariable String id,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortOrder
+    public ResponseEntity<ApiResponse> getHistoryPockets(@PathVariable String id,
+        @RequestParam(name = "sort_by", defaultValue = "id") String sortBy,
+        @RequestParam(name = "sort_order", defaultValue = "desc") String sortOrder,
+        @RequestParam(name= "type", required = false) PocketTransactionType pocketTransactionType
     ){
         List<PocketTransactionResponse> transactionResponses = pocketService.getHistory(
-                id,
-                sortOrder.equals("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending()
+            id,
+            sortOrder.equals("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending(),
+            pocketTransactionType
         );
 
         return new ResponseEntity<>(

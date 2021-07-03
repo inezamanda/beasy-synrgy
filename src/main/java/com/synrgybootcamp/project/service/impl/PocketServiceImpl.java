@@ -160,28 +160,28 @@ public class PocketServiceImpl implements PocketService {
     }
 
     @Override
-    public List<PocketTransactionResponse> getHistory(String pocketId, Sort sort) {
-        User user = userRepository.findById(userInformation.getUserID())
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user yang dipilih tidak ditemukan"));
-        Pocket pocket = pocketRepository.findById(pocketId)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "pocket yang dipilih tidak ditemukan"));
+    public List<PocketTransactionResponse> getHistory(String pocketId, Sort sort, PocketTransactionType type) {
+        String userId = userInformation.getUserID();
 
-        List<PocketTransaction> transactions = pocketTransactionRepository
-                .findByUserAndSourcePocketOrUserAndDestinationPocket(user, pocket, user, pocket);
-
-        return transactions.stream()
-                .map(pocketTransaction -> PocketTransactionResponse.builder()
-                        .amount(pocketTransaction.getAmount())
-                        .pocketTransactionType(pocketTransaction.getPocketTransactionType())
-                        .pocketBalanceStatus(
-                                pocketTransaction.getSourcePocket().getId() == pocketId
-                                        ? PocketBalanceStatus.PLUS : PocketBalanceStatus.MINUS
-                        ).date(pocketTransaction.getDate())
-                        .build())
-                .collect(Collectors.toList());
+        return pocketTransactionRepository
+            .findByUserIdAndSourcePocketIdOrUserIdAndDestinationPocketId(userId, pocketId, userId, pocketId, sort)
+            .stream()
+            .map(pocketTransaction -> PocketTransactionResponse.builder()
+                .amount(pocketTransaction.getAmount())
+                .pocketTransactionType(pocketTransaction.getPocketTransactionType())
+                .pocketBalanceStatus(
+                    pocketTransaction.getDestinationPocketId().equals(pocketId)
+                        ? PocketBalanceStatus.PLUS : PocketBalanceStatus.MINUS
+                ).date(pocketTransaction.getDate())
+                .build())
+            .filter(pocketTransactionResponse -> {
+                if (Objects.nonNull(type)) {
+                    return pocketTransactionResponse.getPocketTransactionType().equals(type);
+                } else {
+                    return true;
+                }
+            }).collect(Collectors.toList());
     }
-
-
 
     @Override
     public boolean deletePocketById(String id ) {

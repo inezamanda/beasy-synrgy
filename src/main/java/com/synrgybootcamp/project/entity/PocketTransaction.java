@@ -41,12 +41,21 @@ public class PocketTransaction {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
+    @Column(name = "user_id", insertable = false, updatable = false)
+    private String userId;
+
     @ManyToOne
     @JoinColumn(name = "source_pocket_id", referencedColumnName = "id")
     private Pocket sourcePocket;
 
+    @Column(name = "source_pocket_id", insertable = false, updatable = false)
+    private String sourcePocketId;
+
     @ManyToOne
     @JoinColumn(name = "destination_pocket_id", referencedColumnName = "id")
     private Pocket destinationPocket;
+
+    @Column(name = "destination_pocket_id", insertable = false, updatable = false)
+    private String destinationPocketId;
 
 }
