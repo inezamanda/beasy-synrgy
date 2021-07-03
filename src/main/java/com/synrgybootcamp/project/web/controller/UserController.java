@@ -33,25 +33,19 @@ public class UserController {
     @GetMapping("api/user/balance")
     @ApiOperation(value = "Get user balance")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> getUserBalance() {
+    public ApiResponse<UserBalanceResponse> getUserBalance() {
         UserBalanceResponse balance = userBalanceService.getUserBalance(userInformation.getUserID());
 
-        return new ResponseEntity<>(
-                new ApiResponse("successfully get user balance", balance),
-                HttpStatus.OK
-        );
+        return new ApiResponse<>("successfully get user balance", balance);
 
     }
 
     @GetMapping("api/gamification/me")
     @ApiOperation(value = "Get user gamification status")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> getUserGamificationStatus() {
+    public ApiResponse<UserGamificationStatusResponse> getUserGamificationStatus() {
         UserGamificationStatusResponse gamificationStatusResponse = gamificationHelper.getUserPlanetGamificationStatus();
 
-        return new ResponseEntity<>(
-            new ApiResponse("successfully get user gamification status", gamificationStatusResponse),
-            HttpStatus.OK
-        );
+        return new ApiResponse<>("successfully get user gamification status", gamificationStatusResponse);
     }
 }

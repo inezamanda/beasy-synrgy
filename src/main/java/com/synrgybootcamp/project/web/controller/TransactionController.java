@@ -1,5 +1,6 @@
 package com.synrgybootcamp.project.web.controller;
 
+import com.synrgybootcamp.project.service.TransactionService;
 import com.synrgybootcamp.project.service.impl.TransactionServiceImpl;
 import com.synrgybootcamp.project.util.ApiResponse;
 import com.synrgybootcamp.project.web.model.response.RecentTransactionResponse;
@@ -21,16 +22,14 @@ import java.util.List;
 public class TransactionController {
 
     @Autowired
-    private TransactionServiceImpl transactionService;
+    private TransactionService transactionService;
 
     @GetMapping("payment/recent")
     @ApiOperation(value = "Get recent transaction from payment")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> getRecentPaymentTransaction() {
+    public ApiResponse<List<RecentTransactionResponse>> getRecentPaymentTransaction() {
         List<RecentTransactionResponse> recentTransactionResponses = transactionService.recentTransaction();
-        return new ResponseEntity<>(
-                new ApiResponse("Successfully get recent payment transaction", recentTransactionResponses)
-                , HttpStatus.OK
-        );
+
+        return new ApiResponse<>("Successfully get recent payment transaction", recentTransactionResponses);
     }
 }

@@ -4,6 +4,7 @@ import com.synrgybootcamp.project.enums.PocketTransactionType;
 import com.synrgybootcamp.project.security.utility.UserInformation;
 import com.synrgybootcamp.project.service.PocketService;
 import com.synrgybootcamp.project.util.ApiResponse;
+import com.synrgybootcamp.project.util.ApiResponseWithoutData;
 import com.synrgybootcamp.project.util.UploadFileUtil;
 import com.synrgybootcamp.project.web.model.request.MovePocketBalanceRequest;
 import com.synrgybootcamp.project.web.model.request.PocketRequest;
@@ -16,8 +17,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,46 +38,37 @@ public class PocketController {
     @GetMapping("")
     @ApiOperation(value = "Get list of pockets")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> getAllPockets(){
+    public ApiResponse<List<PocketResponse>> getAllPockets(){
 
         List<PocketResponse> pocketResponse = pocketService.getAllPocket();
 
-        return new ResponseEntity<>(
-                new ApiResponse("successfully get pocket user", pocketResponse),
-                HttpStatus.OK
-        );
+        return new ApiResponse<>("successfully get pocket user", pocketResponse);
     }
 
     @PostMapping("")
     @ApiOperation(value = "Create new pocket")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> createPocket(
+    public ApiResponse<PocketResponse> createPocket(
             @ModelAttribute PocketRequest pocketRequest
     ){
         PocketResponse createPocket = pocketService.createPocket(pocketRequest);
 
-        return new ResponseEntity<>(
-                new ApiResponse("success create pocket data", createPocket),
-                HttpStatus.OK
-        );
+        return new ApiResponse<>("success create pocket data", createPocket);
     }
 
     @GetMapping("/{id}")
     @ApiOperation(value = "Get detail of pocket")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> getPocketsByID(@PathVariable String id){
+    public ApiResponse<PocketResponse> getPocketsByID(@PathVariable String id){
         PocketResponse detailPocket = pocketService.getDetailPocketByID(id);
 
-        return new ResponseEntity<>(
-                new ApiResponse("success get detail pocket data", detailPocket),
-                HttpStatus.OK
-        );
+        return new ApiResponse<>("success get detail pocket data", detailPocket);
     }
 
     @GetMapping("/{id}/history")
     @ApiOperation(value = "Get history of pocket")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> getHistoryPockets(@PathVariable String id,
+    public ApiResponse<List<PocketTransactionResponse>> getHistoryPockets(@PathVariable String id,
         @RequestParam(name = "sort_by", defaultValue = "id") String sortBy,
         @RequestParam(name = "sort_order", defaultValue = "desc") String sortOrder,
         @RequestParam(name= "type", required = false) PocketTransactionType pocketTransactionType
@@ -89,39 +79,31 @@ public class PocketController {
             pocketTransactionType
         );
 
-        return new ResponseEntity<>(
-                new ApiResponse("successfully get history pocket", transactionResponses),
-                HttpStatus.OK
-        );
+        return new ApiResponse<>("successfully get history pocket", transactionResponses);
 
     }
 
     @DeleteMapping("/{id}")
     @ApiOperation(value = "Delete pocket")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> deletePocketsByID(@PathVariable String id){
-       boolean pocketDelete = pocketService.deletePocketById(id);
+    public ApiResponseWithoutData deletePocketsByID(@PathVariable String id){
+       pocketService.deletePocketById(id);
 
-        return new ResponseEntity<>(
-                new ApiResponse(pocketDelete ?"success delete pocket data" : "data pocket tidak ditemukan" ),
-                HttpStatus.OK
-        );
+        return new ApiResponseWithoutData("success delete pocket data");
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse> updatePocketByID(
+    public ApiResponse<PocketResponse> updatePocketByID(
             @PathVariable String id,
             @ModelAttribute PocketRequest pocketRequest){
 
        PocketResponse editPocket = pocketService.updatePocketById(id,pocketRequest);
 
-        return new ResponseEntity<>(
-                new ApiResponse("success edit pocket data",editPocket),HttpStatus.OK
-        );
+        return new ApiResponse<>("success edit pocket data",editPocket);
     }
 
     @PostMapping("{id}/topup")
-    public ResponseEntity<Object> topUpPocket(
+    public ApiResponse<TopUpPocketBalanceResponse> topUpPocket(
             @PathVariable String id,
             @RequestBody TopUpPocketBalanceRequest payload
     ) {
@@ -135,14 +117,11 @@ public class PocketController {
                                 .build()
                 );
 
-        return new ResponseEntity<>(
-                new ApiResponse("Top up pocket success", topUpResult)
-                , HttpStatus.OK
-        );
+        return new ApiResponse<>("Top up pocket success", topUpResult);
     }
 
     @PostMapping("{id}/move")
-    public ResponseEntity<Object> movePocketBalance(
+    public ApiResponse<MovePocketBalanceResponse> movePocketBalance(
             @PathVariable String id,
             @RequestBody MovePocketBalanceRequest payload
     ) {
@@ -155,9 +134,6 @@ public class PocketController {
                                 .build()
                 );
 
-        return new ResponseEntity<>(
-                new ApiResponse("Move pocket balance success", moveBalanceResult)
-                , HttpStatus.OK
-        );
+        return new ApiResponse<>("Move pocket balance success", moveBalanceResult);
     }
 }

@@ -2,8 +2,10 @@ package com.synrgybootcamp.project.web.controller;
 
 import com.synrgybootcamp.project.entity.User;
 import com.synrgybootcamp.project.helper.GamificationHelper;
+import com.synrgybootcamp.project.service.AuthService;
 import com.synrgybootcamp.project.service.impl.AuthServiceImpl;
 import com.synrgybootcamp.project.util.ApiResponse;
+import com.synrgybootcamp.project.util.ApiResponseWithoutData;
 import com.synrgybootcamp.project.util.ErrorResponse;
 import com.synrgybootcamp.project.web.model.request.ChangePasswordRequest;
 import com.synrgybootcamp.project.web.model.request.ForgotPasswordRequest;
@@ -23,65 +25,52 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "Authentication", description = "Authentication Controller")
 public class AuthController {
     @Autowired
-    private AuthServiceImpl authService;
+    private AuthService authService;
 
     @Autowired
     GamificationHelper gamificationHelper;
 
     @PostMapping("signin")
     @ApiOperation(value = "Sign In User")
-    public ResponseEntity<Object> signIn(
+    public ApiResponse<SignInResponse> signIn(
             @RequestBody SignInRequest signInRequest
     ) {
         SignInResponse signInResponse = authService.signIn(signInRequest);
 
-        return new ResponseEntity<>(
-                new ApiResponse("Sign In Success", signInResponse)
-                , HttpStatus.OK
-        );
+        return new ApiResponse<>("Sign In Success", signInResponse);
     }
 
     @PostMapping("signup")
     @ApiOperation(value = "Sign Up User (Admin Only)")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Object> signUp(
+    public ApiResponseWithoutData signUp(
             @RequestBody SignUpRequest signUpRequest
     ) {
-        User user = authService.signUp(signUpRequest);
-        if (user == null) {
-            return new ResponseEntity<>(
-                    new ErrorResponse(false,"There is an account with the same email/account_number")
-                    , HttpStatus.BAD_REQUEST
-            );
-        } else {
-            gamificationHelper.startGamificationForNewUser(user);
 
-            return new ResponseEntity<>(
-                    new ApiResponse("Account Created")
-                    , HttpStatus.OK
-            );
-        }
+        User user = authService.signUp(signUpRequest);
+        gamificationHelper.startGamificationForNewUser(user);
+
+        return new ApiResponseWithoutData("Account Created");
     }
 
     @PostMapping("forgot-password")
     @ApiOperation(value = "Request change password for user")
-    public ResponseEntity<Object> forgotPassword(
+    public ApiResponseWithoutData forgotPassword(
             @RequestBody ForgotPasswordRequest forgotPasswordRequest
     ) {
-        return new ResponseEntity<>(
-                new ApiResponse(authService.forgotPassword(forgotPasswordRequest))
-        , HttpStatus.OK);
+        authService.forgotPassword(forgotPasswordRequest);
+
+        return new ApiResponseWithoutData("Email Sended");
     }
 
     @PostMapping("change-password/{token}")
     @ApiOperation(value = "Check token validity and change user password")
-    public ResponseEntity<Object> changePassword(
+    public ApiResponseWithoutData changePassword(
             @PathVariable String token,
             @RequestBody ChangePasswordRequest changePasswordRequest
     ) {
         authService.changePassword(changePasswordRequest, token);
-        return new ResponseEntity<>(
-                new ApiResponse("Password Changed")
-        , HttpStatus.OK);
+
+        return new ApiResponseWithoutData("Password changed");
     }
 }

@@ -1,5 +1,7 @@
 package com.synrgybootcamp.project.web.controller;
 
+import com.synrgybootcamp.project.service.EwalletService;
+import com.synrgybootcamp.project.service.EwalletTransactionService;
 import com.synrgybootcamp.project.service.impl.EwalletServiceImpl;
 import com.synrgybootcamp.project.service.impl.EwalletTransactionServiceImpl;
 import com.synrgybootcamp.project.util.ApiResponse;
@@ -20,41 +22,28 @@ import java.util.List;
 @RequestMapping("api/ewallet")
 @Api(tags = "TopUp Ewallet", description = "Ewallet controller")
 public class EwalletController {
-    @Autowired
-    private EwalletServiceImpl ewalletService;
 
     @Autowired
-    EwalletTransactionServiceImpl ewalletTransactionService;
+    private EwalletService ewalletService;
+
+    @Autowired
+    private EwalletTransactionService ewalletTransactionService;
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @ApiOperation(value = "Get list of ewallet")
-    public ResponseEntity<ApiResponse> getAllEwallets() {
-        List<EwalletResponse> ewallets = ewalletService.getAllEwallets(
-        );
+    public ApiResponse<List<EwalletResponse>> getAllEwallets() {
+        List<EwalletResponse> ewallets = ewalletService.getAllEwallets();
 
-        return new ResponseEntity<>(
-                new ApiResponse("success get ewallets data", ewallets), HttpStatus.OK
-        );
+        return new ApiResponse<>("success get ewallets data", ewallets);
     }
 
     @PostMapping()
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @ApiOperation(value = "Top Up Ewallet")
-    public ResponseEntity<Object> ewalletTransaction(@RequestBody EwalletTransactionRequest ewalletTransactionRequest) {
-        EwalletTransactionResponse ewalletResult = ewalletTransactionService.ewalletTransaction(
-                EwalletTransactionRequest
-                        .builder()
-                        .accountId(ewalletTransactionRequest.getAccountId())
-                        .amount(ewalletTransactionRequest.getAmount())
-                        .message(ewalletTransactionRequest.getMessage())
-                        .pin(ewalletTransactionRequest.getPin())
-                        .build()
-        );
+    public ApiResponse<EwalletTransactionResponse> ewalletTransaction(@RequestBody EwalletTransactionRequest ewalletTransactionRequest) {
+        EwalletTransactionResponse ewalletResult = ewalletTransactionService.ewalletTransaction(ewalletTransactionRequest);
 
-        return new ResponseEntity<>(
-                new ApiResponse("Ewallet transaction success", ewalletResult)
-                , HttpStatus.OK
-        );
+        return new ApiResponse<>("Ewallet transaction success", ewalletResult);
     }
 }

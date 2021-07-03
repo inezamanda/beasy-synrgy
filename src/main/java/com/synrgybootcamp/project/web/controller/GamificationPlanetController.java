@@ -1,8 +1,8 @@
 package com.synrgybootcamp.project.web.controller;
 
 import com.synrgybootcamp.project.enums.PlanetStatus;
+import com.synrgybootcamp.project.service.GamificationPlanetRewardService;
 import com.synrgybootcamp.project.service.GamificationPlanetService;
-import com.synrgybootcamp.project.service.impl.GamificationPlanetRewardServiceImpl;
 import com.synrgybootcamp.project.util.ApiResponse;
 import com.synrgybootcamp.project.web.model.response.GamificationRewardPlanetResponse;
 import com.synrgybootcamp.project.web.model.response.ListPlanetResponse;
@@ -10,8 +10,6 @@ import com.synrgybootcamp.project.web.model.response.PlanetDetailResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,42 +28,36 @@ public class GamificationPlanetController {
   private GamificationPlanetService gamificationPlanetService;
 
   @Autowired
-  private GamificationPlanetRewardServiceImpl gamificationPlanetRewardService;
+  private GamificationPlanetRewardService gamificationPlanetRewardService;
 
   @GetMapping("")
   @ApiOperation(value = "Get list of planets")
   @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-  public ResponseEntity<ApiResponse> getPlanets(
+  public ApiResponse<List<ListPlanetResponse>> getPlanets(
       @RequestParam(required = false) PlanetStatus status
   ) {
     List<ListPlanetResponse> planetResponseList = gamificationPlanetService.getAllPlanets(status);
 
-    return new ResponseEntity<>(
-        new ApiResponse("success get planet lists", planetResponseList), HttpStatus.OK
-    );
+    return new ApiResponse<>("success get planet lists", planetResponseList);
   }
 
   @GetMapping("/{planetId}")
   @ApiOperation(value = "Get detail of planet")
   @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-  public ResponseEntity<ApiResponse> getPlanetDetail(
+  public ApiResponse<PlanetDetailResponse> getPlanetDetail(
       @PathVariable String planetId
   ) {
     PlanetDetailResponse planet = gamificationPlanetService.getPlanetDetail(planetId);
 
-    return new ResponseEntity<>(
-        new ApiResponse("success get planet detail", planet), HttpStatus.OK
-    );
+    return new ApiResponse<>("success get planet detail", planet);
   }
 
   @GetMapping("/{planetId}/reward")
   @ApiOperation(value = "Get reward of planet")
-  public ResponseEntity<ApiResponse> getRewardPlanetById(@PathVariable String planetId) {
+  public ApiResponse<GamificationRewardPlanetResponse> getRewardPlanetById(@PathVariable String planetId) {
     GamificationRewardPlanetResponse gamificationRewardPlanetResponse = gamificationPlanetRewardService.getPlanetRewardById(planetId);
 
-    return new ResponseEntity<>(
-        new ApiResponse("Successfully get planet reward", gamificationRewardPlanetResponse), HttpStatus.OK
-    );
+    return new ApiResponse<>("Successfully get planet reward", gamificationRewardPlanetResponse);
   }
 
 }
