@@ -1,10 +1,14 @@
 package com.synrgybootcamp.project.service;
 
 import com.synrgybootcamp.project.web.model.response.ClaimGamificationRewardResponse;
-import com.synrgybootcamp.project.web.model.response.GamificationRewardPlanetResponse;
-import org.springframework.web.bind.annotation.PathVariable;
+import com.synrgybootcamp.project.web.model.response.CurrentRewardResponse;
+import com.synrgybootcamp.project.web.model.response.DetailRewardResponse;
+
+import java.util.List;
 
 public interface GamificationPlanetRewardService {
-    GamificationRewardPlanetResponse getPlanetRewardById(String planetId);
+    DetailRewardResponse getPlanetRewardById(String planetId);
+    DetailRewardResponse getRewardById(String rewardId);
     ClaimGamificationRewardResponse claimGamificationReward(String rewardId);
+    List<CurrentRewardResponse> getCurrentReward();
 }

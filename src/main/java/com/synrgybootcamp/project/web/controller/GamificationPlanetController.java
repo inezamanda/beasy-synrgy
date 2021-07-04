@@ -4,7 +4,7 @@ import com.synrgybootcamp.project.enums.PlanetStatus;
 import com.synrgybootcamp.project.service.GamificationPlanetRewardService;
 import com.synrgybootcamp.project.service.GamificationPlanetService;
 import com.synrgybootcamp.project.util.ApiResponse;
-import com.synrgybootcamp.project.web.model.response.GamificationRewardPlanetResponse;
+import com.synrgybootcamp.project.web.model.response.DetailRewardResponse;
 import com.synrgybootcamp.project.web.model.response.ListPlanetResponse;
 import com.synrgybootcamp.project.web.model.response.PlanetDetailResponse;
 import io.swagger.annotations.Api;
@@ -54,10 +54,11 @@ public class GamificationPlanetController {
 
   @GetMapping("/{planetId}/reward")
   @ApiOperation(value = "Get reward of planet")
-  public ApiResponse<GamificationRewardPlanetResponse> getRewardPlanetById(@PathVariable String planetId) {
-    GamificationRewardPlanetResponse gamificationRewardPlanetResponse = gamificationPlanetRewardService.getPlanetRewardById(planetId);
+  @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+  public ApiResponse<DetailRewardResponse> getRewardPlanetById(@PathVariable String planetId) {
+    DetailRewardResponse detailRewardResponse = gamificationPlanetRewardService.getPlanetRewardById(planetId);
 
-    return new ApiResponse<>("Successfully get planet reward", gamificationRewardPlanetResponse);
+    return new ApiResponse<>("Successfully get planet reward", detailRewardResponse);
   }
 
 }
