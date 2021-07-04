@@ -2,6 +2,7 @@ package com.synrgybootcamp.project.service.impl;
 
 import com.synrgybootcamp.project.entity.Planet;
 import com.synrgybootcamp.project.entity.Pocket;
+import com.synrgybootcamp.project.entity.RewardPlanet;
 import com.synrgybootcamp.project.entity.User;
 import com.synrgybootcamp.project.entity.UserReward;
 import com.synrgybootcamp.project.enums.RewardPlanetType;
@@ -15,21 +16,27 @@ import com.synrgybootcamp.project.service.GamificationPlanetRewardService;
 import com.synrgybootcamp.project.util.ApiException;
 import com.synrgybootcamp.project.util.VoucherDiscountUtil;
 import com.synrgybootcamp.project.web.model.response.ClaimGamificationRewardResponse;
-import com.synrgybootcamp.project.web.model.response.GamificationRewardPlanetResponse;
+import com.synrgybootcamp.project.web.model.response.CurrentRewardResponse;
+import com.synrgybootcamp.project.web.model.response.DetailRewardResponse;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class GamificationPlanetRewardServiceImpl implements GamificationPlanetRewardService {
 
     @Autowired
     private PlanetRepository planetRepository;
+
+    @Autowired
+    private RewardPlanetRepository rewardPlanetRepository;
 
     @Autowired
     private UserRewardRepository userRewardRepository;
@@ -44,7 +51,7 @@ public class GamificationPlanetRewardServiceImpl implements GamificationPlanetRe
     UserInformation userInformation;
 
     @Override
-    public GamificationRewardPlanetResponse getPlanetRewardById(@PathVariable String planetId) {
+    public DetailRewardResponse getPlanetRewardById(@PathVariable String planetId) {
 
         Planet planet = planetRepository.findById(planetId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "planet tidak ditemukan"));
@@ -62,7 +69,7 @@ public class GamificationPlanetRewardServiceImpl implements GamificationPlanetRe
             }
         }
 
-        return GamificationRewardPlanetResponse.builder()
+        return DetailRewardResponse.builder()
                 .id(planet.getId())
                 .type(planet.getRewardPlanet().getType())
                 .wording(planet.getRewardPlanet().getWording())
@@ -99,5 +106,45 @@ public class GamificationPlanetRewardServiceImpl implements GamificationPlanetRe
         userRewardRepository.save(userReward);
 
         return response.build();
+    }
+
+    @Override
+    public List<CurrentRewardResponse> getCurrentReward() {
+        return userRewardRepository.findByUserIdAndClaimedFalse(userInformation.getUserID())
+            .stream()
+            .map(UserReward::getRewardPlanet)
+            .map(reward -> CurrentRewardResponse.builder()
+                .id(reward.getId())
+                .type(reward.getType())
+                .wording(reward.getWording())
+                .build())
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public DetailRewardResponse getRewardById(String rewardId) {
+        RewardPlanet reward = rewardPlanetRepository.findById(rewardId)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "reward tidak ditemukan"));
+
+        User user = userRepository.findById(userInformation.getUserID())
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user tidak ditemukan"));
+
+        boolean claimed = false;
+        if(!CollectionUtils.isEmpty(reward.getUserRewards())){
+            List<UserReward> userRewards = reward.getUserRewards();
+            for (UserReward userReward : userRewards){
+                if(userReward.getUser().equals(user)){
+                    claimed = userReward.getClaimed();
+                }
+            }
+        }
+
+        return DetailRewardResponse.builder()
+            .id(reward.getId())
+            .type(reward.getType())
+            .wording(reward.getWording())
+            .tnc(reward.getTnc())
+            .claimed(claimed)
+            .build();
     }
 }

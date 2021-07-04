@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GamificationRewardPlanetResponse {
+public class DetailRewardResponse {
+
     String id;
 
     RewardPlanetType type;
