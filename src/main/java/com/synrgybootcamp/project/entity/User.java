@@ -57,8 +57,8 @@ public class User {
     private Boolean verifCodeStatus;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "last_mission_completion_time")
-    private Date date = new Date();
+    @Column(name = "last_planet_completion_time")
+    private Date lastPlanetCompletionTime;
 
     @ManyToOne
     @JoinColumn(name = "current_planet_id", referencedColumnName = "id")
@@ -97,6 +97,10 @@ public class User {
     @OneToMany
     @JoinColumn(name = "user_id")
     private List<UserMission> userMissions;
+
+    @OneToMany
+    @JoinColumn(name = "user_id")
+    private List<CreditCardBill> creditCardBills;
 
     @Override
     public boolean equals(Object o) {

@@ -1,6 +1,6 @@
 package com.synrgybootcamp.project.entity;
 
-import com.synrgybootcamp.project.enums.RewardPlanetName;
+import com.synrgybootcamp.project.enums.RewardPlanetType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Builder
@@ -24,8 +25,8 @@ public class RewardPlanet {
     private String id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "name")
-    private RewardPlanetName rewardName;
+    @Column(name = "type")
+    private RewardPlanetType type;
 
     @Column(name = "wording")
     private String wording;
@@ -39,4 +40,8 @@ public class RewardPlanet {
     @OneToOne
     @JoinColumn(name = "planet_id", referencedColumnName = "id")
     private Planet planet;
+
+    @OneToMany
+    @JoinColumn(name = "reward_id")
+    private List<UserReward> userRewards;
 }

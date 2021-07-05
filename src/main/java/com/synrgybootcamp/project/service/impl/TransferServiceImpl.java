@@ -3,20 +3,27 @@ package com.synrgybootcamp.project.service.impl;
 import com.synrgybootcamp.project.constant.TransactionConstants;
 import com.synrgybootcamp.project.entity.*;
 import com.synrgybootcamp.project.enums.PocketAction;
+import com.synrgybootcamp.project.enums.RewardPlanetType;
 import com.synrgybootcamp.project.enums.TransactionType;
 import com.synrgybootcamp.project.enums.TransferStatus;
+import com.synrgybootcamp.project.helper.GamificationHelper;
+import com.synrgybootcamp.project.helper.GamificationMissionHelper;
 import com.synrgybootcamp.project.repository.*;
 import com.synrgybootcamp.project.security.utility.UserInformation;
 import com.synrgybootcamp.project.service.TransferService;
 import com.synrgybootcamp.project.util.ApiException;
 import com.synrgybootcamp.project.web.model.request.TransferRequest;
 import com.synrgybootcamp.project.web.model.response.TransferResponse;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.TimeZone;
 
 @Service
@@ -39,6 +46,12 @@ public class TransferServiceImpl implements TransferService {
     @Autowired
     TransactionRepository transactionRepository;
 
+    @Autowired
+    UserRewardRepository userRewardRepository;
+
+    @Autowired
+    GamificationMissionHelper missionHelper;
+
     @Override
     @Transactional
     public TransferResponse transfer(TransferRequest transferRequest) {
@@ -51,7 +64,7 @@ public class TransferServiceImpl implements TransferService {
         Contact contact = contactRepository.findById(transferRequest.getContact_id())
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "contact not found"));
 
-        Integer cost = contact.getBank().getPrimary() ? 0 : TransactionConstants.DIFFERENT_BANK_FEE;
+        Integer cost = getTransferCost(user, contact);
 
         if (contact.getBank().getPrimary()) {
             User beneficiary = userRepository.findByAccountNumber(contact.getAccountNumber())
@@ -95,6 +108,10 @@ public class TransferServiceImpl implements TransferService {
                         .build()
         );
 
+        if (!contact.getBank().getPrimary()) {
+            missionHelper.checkAndValidateTransferMission();
+        }
+
         return TransferResponse
                 .builder()
                 .status(TransferStatus.SUCCESS.name())
@@ -107,6 +124,30 @@ public class TransferServiceImpl implements TransferService {
                 .totalTransfer(transfer.getAmount() + transfer.getCost())
                 .refCode(transaction.getId())
                 .build();
+    }
+
+    private Integer getTransferCost(User user, Contact contact) {
+        Integer transferCost = 0;
+
+        if (!contact.getBank().getPrimary()) {
+            transferCost = TransactionConstants.DIFFERENT_BANK_FEE;
+        }
+
+        List<UserReward> rewards  = userRewardRepository.findByUserIdAndClaimedTrueAndExpiredAtBefore(user.getId(), DateUtils.addMonths(new Date(), 1));
+
+        UserReward reward = rewards.stream()
+            .filter(userReward ->
+                userReward.getRewardPlanet().getType().equals(RewardPlanetType.TRANSFER))
+            .findFirst()
+            .orElse(null);
+
+        if (Objects.nonNull(reward)) {
+            transferCost = 0;
+            reward.setTotalUsed(reward.getTotalUsed() + 1);
+            userRewardRepository.save(reward);
+        }
+
+        return transferCost;
     }
 
     private Pocket changePocketBalance(Pocket pocket, Integer amount, PocketAction action) {

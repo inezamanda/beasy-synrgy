@@ -4,6 +4,7 @@ import com.synrgybootcamp.project.entity.Pocket;
 import com.synrgybootcamp.project.entity.Role;
 import com.synrgybootcamp.project.entity.User;
 import com.synrgybootcamp.project.enums.RoleName;
+import com.synrgybootcamp.project.helper.GamificationHelper;
 import com.synrgybootcamp.project.repository.PocketRepository;
 import com.synrgybootcamp.project.repository.RoleRepository;
 import com.synrgybootcamp.project.repository.UserRepository;
@@ -16,6 +17,7 @@ import com.synrgybootcamp.project.web.model.request.ForgotPasswordRequest;
 import com.synrgybootcamp.project.web.model.request.SignInRequest;
 import com.synrgybootcamp.project.web.model.request.SignUpRequest;
 import com.synrgybootcamp.project.web.model.response.SignInResponse;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -71,10 +73,11 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public User signUp(SignUpRequest signUpRequest) {
         if(userRepository.existsByAccountNumber(signUpRequest.getAccountNumber())) {
-            return null;
+            throw new ApiException(HttpStatus.BAD_REQUEST, "There is an account with the same account number");
         }
+
         if(userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return null;
+            throw new ApiException(HttpStatus.BAD_REQUEST, "There is an account with the same email");
         }
 
         Set<Role> roles = new HashSet<>();
@@ -92,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
                     roles.add(roleRepository.findByRoleName(RoleName.ROLE_USER).get());
                     break;
                 default:
-                    return null;
+                    throw new ApiException(HttpStatus.BAD_REQUEST, "Invalid role");
             }
         }
 
@@ -126,7 +129,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String forgotPassword(ForgotPasswordRequest forgotPasswordRequest) {
+    public void forgotPassword(ForgotPasswordRequest forgotPasswordRequest) {
         if (userRepository.existsByAccountNumber(forgotPasswordRequest.getAccountNumber())
         && userRepository.existsByEmail(forgotPasswordRequest.getEmail())) {
             User user = userRepository.findByEmail(forgotPasswordRequest.getEmail())
@@ -144,11 +147,10 @@ public class AuthServiceImpl implements AuthService {
         } else {
             throw new ApiException(HttpStatus.BAD_REQUEST,"You have entered wrong account number/email");
         }
-        return "Email Sended";
     }
 
     @Override
-    public String changePassword(ChangePasswordRequest changePasswordRequest, String token) {
+    public void changePassword(ChangePasswordRequest changePasswordRequest, String token) {
         User user = userRepository.findByVerifCode(token)
                 .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "Token Invalid"));
         if(user.getVerifCodeStatus() == false || user.getVerifCodeStatus() == null) {
@@ -157,7 +159,6 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(changePasswordRequest.getPassword()));
         user.setVerifCodeStatus(false);
         userRepository.save(user);
-        return "Password Changed";
     }
 
     private String buildEmail(String name, String link) {

@@ -28,7 +28,7 @@ public class Mission {
     @Column(name = "mission_type")
     private MissionType missionType;
 
-    @Column(name = "Target")
+    @Column(name = "target")
     private Integer target;
 
     @Column(name = "wording")
@@ -39,6 +39,6 @@ public class Mission {
     private Planet planet;
 
     @OneToMany
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "mission_id")
     private List<UserMission> userMissions;
 }

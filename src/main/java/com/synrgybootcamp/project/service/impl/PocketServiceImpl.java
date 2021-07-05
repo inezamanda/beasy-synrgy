@@ -6,6 +6,7 @@ import com.synrgybootcamp.project.entity.User;
 import com.synrgybootcamp.project.enums.PocketAction;
 import com.synrgybootcamp.project.enums.PocketBalanceStatus;
 import com.synrgybootcamp.project.enums.PocketTransactionType;
+import com.synrgybootcamp.project.helper.GamificationMissionHelper;
 import com.synrgybootcamp.project.repository.PocketRepository;
 import com.synrgybootcamp.project.repository.PocketTransactionRepository;
 import com.synrgybootcamp.project.repository.UserRepository;
@@ -21,8 +22,6 @@ import com.synrgybootcamp.project.web.model.response.MovePocketBalanceResponse;
 import com.synrgybootcamp.project.web.model.response.PocketResponse;
 import com.synrgybootcamp.project.web.model.response.PocketTransactionResponse;
 import com.synrgybootcamp.project.web.model.response.TopUpPocketBalanceResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -31,11 +30,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 public class PocketServiceImpl implements PocketService {
-    private static final Logger LOGGER= LoggerFactory.getLogger(PocketServiceImpl.class);
 
     @Autowired
     private PocketRepository pocketRepository;
@@ -54,6 +53,9 @@ public class PocketServiceImpl implements PocketService {
 
     @Autowired
     UploadFileUtil uploadFileUtil;
+
+    @Autowired
+    GamificationMissionHelper missionHelper;
 
     @Override
     public PocketResponse createPocket(PocketRequest pocketRequest) {
@@ -74,6 +76,8 @@ public class PocketServiceImpl implements PocketService {
                         .build()
         );
 
+        missionHelper.checkAndValidatePocketCreationMission(pocket);
+
         return PocketResponse.builder()
                 .id(pocket.getId())
                 .userId(userInformation.getUserID())
@@ -91,12 +95,14 @@ public class PocketServiceImpl implements PocketService {
         Pocket pocket = pocketRepository.findById(id).orElseThrow(()->
                 new ApiException(HttpStatus.NOT_FOUND,"Pocket tidak ditemukan"));
 
-        String uploadFile = uploadFileUtil.upload(pocketRequest.getPicture());
+        if (Objects.nonNull(pocketRequest.getPicture())) {
+            String uploadFile = uploadFileUtil.upload(pocketRequest.getPicture());
+            pocket.setPicture(uploadFile);
+        }
 
         pocket.setName(pocketRequest.getName());
         pocket.setDueDate(pocketRequest.getDueDate());
         pocket.setTarget(pocketRequest.getTarget());
-        pocket.setPicture(uploadFile);
 
         Pocket pocketResult = pocketRepository.save(pocket);
 
@@ -154,28 +160,28 @@ public class PocketServiceImpl implements PocketService {
     }
 
     @Override
-    public List<PocketTransactionResponse> getHistory(String pocketId, Sort sort) {
-        User user = userRepository.findById(userInformation.getUserID())
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user yang dipilih tidak ditemukan"));
-        Pocket pocket = pocketRepository.findById(pocketId)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "pocket yang dipilih tidak ditemukan"));
+    public List<PocketTransactionResponse> getHistory(String pocketId, Sort sort, PocketTransactionType type) {
+        String userId = userInformation.getUserID();
 
-        List<PocketTransaction> transactions = pocketTransactionRepository
-                .findByUserAndSourcePocketOrUserAndDestinationPocket(user, pocket, user, pocket);
-
-        return transactions.stream()
-                .map(pocketTransaction -> PocketTransactionResponse.builder()
-                        .amount(pocketTransaction.getAmount())
-                        .pocketTransactionType(pocketTransaction.getPocketTransactionType())
-                        .pocketBalanceStatus(
-                                pocketTransaction.getSourcePocket().getId() == pocketId
-                                        ? PocketBalanceStatus.PLUS : PocketBalanceStatus.MINUS
-                        ).date(pocketTransaction.getDate())
-                        .build())
-                .collect(Collectors.toList());
+        return pocketTransactionRepository
+            .findByUserIdAndSourcePocketIdOrUserIdAndDestinationPocketId(userId, pocketId, userId, pocketId, sort)
+            .stream()
+            .map(pocketTransaction -> PocketTransactionResponse.builder()
+                .amount(pocketTransaction.getAmount())
+                .pocketTransactionType(pocketTransaction.getPocketTransactionType())
+                .pocketBalanceStatus(
+                    pocketTransaction.getDestinationPocketId().equals(pocketId)
+                        ? PocketBalanceStatus.PLUS : PocketBalanceStatus.MINUS
+                ).date(pocketTransaction.getDate())
+                .build())
+            .filter(pocketTransactionResponse -> {
+                if (Objects.nonNull(type)) {
+                    return pocketTransactionResponse.getPocketTransactionType().equals(type);
+                } else {
+                    return true;
+                }
+            }).collect(Collectors.toList());
     }
-
-
 
     @Override
     public boolean deletePocketById(String id ) {
@@ -184,11 +190,11 @@ public class PocketServiceImpl implements PocketService {
                 new ApiException(HttpStatus.NOT_FOUND,"Pocket tidak ditemukan"));
 
 
-        if(pocket.getBalance()==0){
+        if ( pocket.getBalance()==0 ){
 
             pocket.setDelete(true);
             pocketRepository.save(pocket);
-        }else {
+        } else {
             throw new ApiException(HttpStatus.OK, "Tidak dapat hapus pocket! Saldo pocket masih ada, harap pindah/move saldo ke pocket utama anda");
 
         }
@@ -215,6 +221,8 @@ public class PocketServiceImpl implements PocketService {
         );
 
         PocketTransaction transactionResult = createPocketTransaction(sourcePocket, destinationPocket, payload.getAmount(), PocketTransactionType.TOP_UP);
+
+        missionHelper.checkAndValidatePocketTopUpMission(payload.getAmount());
 
         return TopUpPocketBalanceResponse
                 .builder()
