@@ -22,13 +22,16 @@ import com.synrgybootcamp.project.web.model.response.MovePocketBalanceResponse;
 import com.synrgybootcamp.project.web.model.response.PocketResponse;
 import com.synrgybootcamp.project.web.model.response.PocketTransactionResponse;
 import com.synrgybootcamp.project.web.model.response.TopUpPocketBalanceResponse;
+import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.transaction.Transactional;
+import java.io.File;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -61,33 +64,66 @@ public class PocketServiceImpl implements PocketService {
     public PocketResponse createPocket(PocketRequest pocketRequest) {
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user yang dipilih tidak ditemukan"));
-        String uploadFile = uploadFileUtil.upload(pocketRequest.getPicture());
 
-        Pocket pocket = pocketRepository.save(
-                Pocket.builder()
-                        .name(pocketRequest.getName())
-                        .picture(uploadFile)
-                        .target(pocketRequest.getTarget())
-                        .primary(false)
-                        .user(user)
-                        .dueDate(pocketRequest.getDueDate())
-                        .balance(0)
-                        .delete(false)
-                        .build()
-        );
+        if(Objects.isNull(pocketRequest.getPicture()))
+        {
+            Pocket pocket = pocketRepository.save(
+                    Pocket.builder()
+                            .name(pocketRequest.getName())
+                            .picture("https://res.cloudinary.com/dh9nmeyfy/image/upload/v1625396319/gqfmtb6xq2ybdux6wgbp.svg")
+                            .target(pocketRequest.getTarget())
+                            .primary(false)
+                            .user(user)
+                            .dueDate(pocketRequest.getDueDate())
+                            .balance(0)
+                            .delete(false)
+                            .build()
+            );
 
-        missionHelper.checkAndValidatePocketCreationMission(pocket);
+            missionHelper.checkAndValidatePocketCreationMission(pocket);
 
-        return PocketResponse.builder()
-                .id(pocket.getId())
-                .userId(userInformation.getUserID())
-                .pocketName(pocket.getName())
-                .picture(uploadFile)
-                .target(pocket.getTarget())
-                .balance(0)
-                .dueDate(pocket.getDueDate())
-                .delete(false)
-                .build();
+            return PocketResponse.builder()
+                    .id(pocket.getId())
+                    .userId(userInformation.getUserID())
+                    .pocketName(pocket.getName())
+                    .picture("https://res.cloudinary.com/dh9nmeyfy/image/upload/v1625396319/gqfmtb6xq2ybdux6wgbp.svg")
+                    .target(pocket.getTarget())
+                    .balance(0)
+                    .dueDate(pocket.getDueDate())
+                    .delete(false)
+                    .build();
+        }else {
+            String uploadFile = uploadFileUtil.upload(pocketRequest.getPicture());
+
+            Pocket pocket = pocketRepository.save(
+                    Pocket.builder()
+                            .name(pocketRequest.getName())
+                            .picture(uploadFile)
+                            .target(pocketRequest.getTarget())
+                            .primary(false)
+                            .user(user)
+                            .dueDate(pocketRequest.getDueDate())
+                            .balance(0)
+                            .delete(false)
+                            .build()
+            );
+
+            missionHelper.checkAndValidatePocketCreationMission(pocket);
+
+            return PocketResponse.builder()
+                    .id(pocket.getId())
+                    .userId(userInformation.getUserID())
+                    .pocketName(pocket.getName())
+                    .picture(uploadFile)
+                    .target(pocket.getTarget())
+                    .balance(0)
+                    .dueDate(pocket.getDueDate())
+                    .delete(false)
+                    .build();
+
+
+        }
+
     }
 
     @Override

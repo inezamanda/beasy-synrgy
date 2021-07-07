@@ -16,7 +16,6 @@ public class UploadFileUtil {
 
     public String upload( MultipartFile picture) {
         logger.trace("Called CloudinaryService.upload with args: "  + ", " + " and the multipart file");
-//        User user = userService.getUserID(authToken, email);
         try {
             Map uploadResult = cloudinary.uploader().upload(picture.getBytes(), ObjectUtils.emptyMap());
             String publicId = uploadResult.get("url").toString();
