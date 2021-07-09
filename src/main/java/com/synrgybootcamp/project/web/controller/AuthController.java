@@ -1,7 +1,6 @@
 package com.synrgybootcamp.project.web.controller;
 
 import com.synrgybootcamp.project.entity.User;
-import com.synrgybootcamp.project.helper.GamificationHelper;
 import com.synrgybootcamp.project.service.AuthService;
 import com.synrgybootcamp.project.service.impl.AuthServiceImpl;
 import com.synrgybootcamp.project.util.ApiResponse;
@@ -27,9 +26,6 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    @Autowired
-    GamificationHelper gamificationHelper;
-
     @PostMapping("signin")
     @ApiOperation(value = "Sign In User")
     public ApiResponse<SignInResponse> signIn(
@@ -48,7 +44,6 @@ public class AuthController {
     ) {
 
         User user = authService.signUp(signUpRequest);
-        gamificationHelper.startGamificationForNewUser(user);
 
         return new ApiResponseWithoutData("Account Created");
     }
