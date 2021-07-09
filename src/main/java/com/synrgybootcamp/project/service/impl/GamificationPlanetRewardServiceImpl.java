@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,18 +60,15 @@ public class GamificationPlanetRewardServiceImpl implements GamificationPlanetRe
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user tidak ditemukan"));
 
-        boolean claimed = false;
-        if(planet.getRewardPlanet().getUserRewards() != null){
-            List<UserReward> userRewards = planet.getRewardPlanet().getUserRewards();
-            for (UserReward userReward : userRewards){
-                if(userReward.getUser().equals(user)){
-                    claimed = userReward.getClaimed();
-                }
-            }
-        }
+        boolean claimed = Optional.of(planet)
+            .map(Planet::getRewardPlanet)
+            .map(RewardPlanet::getUserRewards)
+            .flatMap(ur -> ur.stream().filter(r -> r.getUser().equals(user)).findFirst())
+            .map(UserReward::getClaimed)
+            .orElse(false);
 
         return DetailRewardResponse.builder()
-                .id(planet.getId())
+                .id(planet.getRewardPlanet().getId())
                 .type(planet.getRewardPlanet().getType())
                 .wording(planet.getRewardPlanet().getWording())
                 .tnc(planet.getRewardPlanet().getTnc())
@@ -129,15 +127,11 @@ public class GamificationPlanetRewardServiceImpl implements GamificationPlanetRe
         User user = userRepository.findById(userInformation.getUserID())
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user tidak ditemukan"));
 
-        boolean claimed = false;
-        if(!CollectionUtils.isEmpty(reward.getUserRewards())){
-            List<UserReward> userRewards = reward.getUserRewards();
-            for (UserReward userReward : userRewards){
-                if(userReward.getUser().equals(user)){
-                    claimed = userReward.getClaimed();
-                }
-            }
-        }
+        boolean claimed = Optional.of(reward)
+            .map(RewardPlanet::getUserRewards)
+            .flatMap(ur -> ur.stream().filter(r -> r.getUser().equals(user)).findFirst())
+            .map(UserReward::getClaimed)
+            .orElse(false);
 
         return DetailRewardResponse.builder()
             .id(reward.getId())
