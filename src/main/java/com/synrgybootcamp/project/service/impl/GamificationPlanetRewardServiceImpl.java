@@ -60,7 +60,7 @@ public class GamificationPlanetRewardServiceImpl implements GamificationPlanetRe
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user tidak ditemukan"));
 
-        boolean claimed = Optional.of(planet)
+        boolean claimed = Optional.ofNullable(planet)
             .map(Planet::getRewardPlanet)
             .map(RewardPlanet::getUserRewards)
             .flatMap(ur -> ur.stream().filter(r -> r.getUser().equals(user)).findFirst())
@@ -127,7 +127,7 @@ public class GamificationPlanetRewardServiceImpl implements GamificationPlanetRe
         User user = userRepository.findById(userInformation.getUserID())
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user tidak ditemukan"));
 
-        boolean claimed = Optional.of(reward)
+        boolean claimed = Optional.ofNullable(reward)
             .map(RewardPlanet::getUserRewards)
             .flatMap(ur -> ur.stream().filter(r -> r.getUser().equals(user)).findFirst())
             .map(UserReward::getClaimed)

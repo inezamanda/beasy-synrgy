@@ -223,7 +223,7 @@ public class GamificationHelper {
     UserReward userReward = UserReward
         .builder()
         .rewardPlanet(currentPlanetReward)
-        .user(user)
+        .user(getUser())
         .claimed(false)
         .expired(false)
         .totalUsed(0)
