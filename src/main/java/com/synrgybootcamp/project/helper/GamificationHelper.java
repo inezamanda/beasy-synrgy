@@ -89,42 +89,64 @@ public class GamificationHelper {
   }
 
   public UserGamificationStatusResponse getUserGamificationStatusResponse(Planet planet, boolean onCompletionDelay) {
-    Date lastCompletionDelay = null;
+    Date recentPlanetCompletionDelayFinished = null;
     if(Objects.nonNull(getUser().getLastPlanetCompletionTime())) {
-      lastCompletionDelay = DateUtils.addDays(getUser().getLastPlanetCompletionTime(), 1);
+      recentPlanetCompletionDelayFinished = DateUtils.addDays(getUser().getLastPlanetCompletionTime(), 1);
     }
 
     if (Objects.isNull(planet)) {
       throw new ApiException(HttpStatus.BAD_REQUEST, "You need to start gamification first");
     }
 
-    return UserGamificationStatusResponse.builder()
+    UserGamificationStatusResponse.UserGamificationStatusResponseBuilder res = UserGamificationStatusResponse.builder()
         .planetId(planet.getId())
         .planetName(planet.getName())
         .planetImage(planet.getImage())
         .planetSequence(planet.getSequence())
         .planetWording(planet.getWording())
         .onCompletionDelay(onCompletionDelay)
-        .lastPlanetCompletionDelayFinished(lastCompletionDelay)
+        .recentPlanetCompletionDelayFinished(recentPlanetCompletionDelayFinished);
+
+    boolean isOnLastPlanet = planet.getSequence() == GamificationConstant.LAST_PLANET_SEQUENCE;
+    boolean isCompletedGamification = false;
+    if (isOnLastPlanet) {
+      Planet lastPlanet = planetRepository.findFirstBySequence(GamificationConstant.LAST_PLANET_SEQUENCE).orElse(getUser().getPlanet());
+      List<Mission> lastPlanetMission = missionRepository.findByPlanet(lastPlanet);
+      long completedLastPlanetMission = getTotalCompletedPlanetMission(lastPlanetMission);
+      isCompletedGamification = completedLastPlanetMission >= GamificationConstant.MINIMUM_COMPLETED_MISSION;
+    } else {
+      Planet nextPlanet = planetRepository.findFirstBySequence(planet.getSequence() + 1).orElse(getUser().getPlanet());
+      res.nextPlanetId(nextPlanet.getId())
+          .nextPlanetName(nextPlanet.getName())
+          .nextPlanetSequence(nextPlanet.getSequence())
+          .nextPlanetWording(nextPlanet.getWording())
+          .nextPlanetImage(nextPlanet.getImage());
+    }
+
+    return res.completedGamification(isCompletedGamification)
+        .onLastPlanet(isOnLastPlanet)
         .build();
   }
 
   public void checkForPlanetCompletion() {
     List<Mission> planetMission = missionRepository.findByPlanet(getUser().getPlanet());
 
-    long totalCompleted = Optional.ofNullable(planetMission)
-        .map(res -> res.stream()
-            .map(this::fetchOnlyFinishedMission)
-            .filter(Objects::nonNull)
-            .count())
-        .orElse(0L);
-
+    long totalCompleted = getTotalCompletedPlanetMission(planetMission);
     if (totalCompleted >= GamificationConstant.MINIMUM_COMPLETED_MISSION) {
       log.info("user" + getUser().getFullName() + "completed their minimum mission planet");
 
       addUserReward();
       changeToNextPlanet();
     }
+  }
+
+  private long getTotalCompletedPlanetMission(List<Mission> planetMission) {
+    return Optional.ofNullable(planetMission)
+        .map(res -> res.stream()
+            .map(this::fetchOnlyFinishedMission)
+            .filter(Objects::nonNull)
+            .count())
+        .orElse(0L);
   }
 
   public boolean isReadyToStartMission() {
