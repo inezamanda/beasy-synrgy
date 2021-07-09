@@ -59,15 +59,12 @@ public class GamificationPlanetRewardServiceImpl implements GamificationPlanetRe
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user tidak ditemukan"));
 
-        boolean claimed = false;
-        if(planet.getRewardPlanet().getUserRewards() != null){
-            List<UserReward> userRewards = planet.getRewardPlanet().getUserRewards();
-            for (UserReward userReward : userRewards){
-                if(userReward.getUser().equals(user)){
-                    claimed = userReward.getClaimed();
-                }
-            }
-        }
+        boolean claimed = Optional.ofNullable(planet)
+            .map(Planet::getRewardPlanet)
+            .map(RewardPlanet::getUserRewards)
+            .flatMap(ur -> ur.stream().filter(r -> r.getUser().equals(user)).findFirst())
+            .map(UserReward::getClaimed)
+            .orElse(false);
 
         return DetailRewardResponse.builder()
                 .id(planet.getId())
@@ -129,15 +126,11 @@ public class GamificationPlanetRewardServiceImpl implements GamificationPlanetRe
         User user = userRepository.findById(userInformation.getUserID())
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user tidak ditemukan"));
 
-        boolean claimed = false;
-        if(!CollectionUtils.isEmpty(reward.getUserRewards())){
-            List<UserReward> userRewards = reward.getUserRewards();
-            for (UserReward userReward : userRewards){
-                if(userReward.getUser().equals(user)){
-                    claimed = userReward.getClaimed();
-                }
-            }
-        }
+        boolean claimed = Optional.ofNullable(reward)
+            .map(RewardPlanet::getUserRewards)
+            .flatMap(ur -> ur.stream().filter(r -> r.getUser().equals(user)).findFirst())
+            .map(UserReward::getClaimed)
+            .orElse(false);
 
         return DetailRewardResponse.builder()
             .id(reward.getId())
