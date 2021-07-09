@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,7 +68,7 @@ public class GamificationPlanetRewardServiceImpl implements GamificationPlanetRe
             .orElse(false);
 
         return DetailRewardResponse.builder()
-                .id(planet.getId())
+                .id(planet.getRewardPlanet().getId())
                 .type(planet.getRewardPlanet().getType())
                 .wording(planet.getRewardPlanet().getWording())
                 .tnc(planet.getRewardPlanet().getTnc())

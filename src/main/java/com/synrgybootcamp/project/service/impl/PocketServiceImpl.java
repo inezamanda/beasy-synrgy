@@ -61,20 +61,25 @@ public class PocketServiceImpl implements PocketService {
     public PocketResponse createPocket(PocketRequest pocketRequest) {
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user yang dipilih tidak ditemukan"));
-        String uploadFile = uploadFileUtil.upload(pocketRequest.getPicture());
+
+        String uploadFile = "https://res.cloudinary.com/dh9nmeyfy/image/upload/v1625748228/defaultImage_dhkqzi.jpg";
+        if (Objects.nonNull(pocketRequest.getPicture())) {
+             uploadFile = uploadFileUtil.upload(pocketRequest.getPicture());
+
+        }
 
         Pocket pocket = pocketRepository.save(
-                Pocket.builder()
-                        .name(pocketRequest.getName())
-                        .picture(uploadFile)
-                        .target(pocketRequest.getTarget())
-                        .primary(false)
-                        .user(user)
-                        .dueDate(pocketRequest.getDueDate())
-                        .balance(0)
-                        .delete(false)
-                        .build()
-        );
+                    Pocket.builder()
+                            .name(pocketRequest.getName())
+                            .picture(uploadFile)
+                            .target(pocketRequest.getTarget())
+                            .primary(false)
+                            .user(user)
+                            .dueDate(pocketRequest.getDueDate())
+                            .balance(0)
+                            .delete(false)
+                            .build()
+            );
 
         missionHelper.checkAndValidatePocketCreationMission(pocket);
 
@@ -88,6 +93,8 @@ public class PocketServiceImpl implements PocketService {
                 .dueDate(pocket.getDueDate())
                 .delete(false)
                 .build();
+
+
     }
 
     @Override
