@@ -1,20 +1,20 @@
 package com.synrgybootcamp.project.web.controller;
 
+import com.synrgybootcamp.project.enums.DateFilter;
 import com.synrgybootcamp.project.helper.GamificationHelper;
 import com.synrgybootcamp.project.security.utility.UserInformation;
+import com.synrgybootcamp.project.service.DashboardService;
 import com.synrgybootcamp.project.service.UserBalanceService;
 import com.synrgybootcamp.project.util.ApiResponse;
-import com.synrgybootcamp.project.web.model.response.ExampleResponse;
 import com.synrgybootcamp.project.web.model.response.UserBalanceResponse;
 import com.synrgybootcamp.project.web.model.response.UserGamificationStatusResponse;
+import com.synrgybootcamp.project.web.model.response.WebDashboardResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -30,6 +30,9 @@ public class UserController {
     @Autowired
     private GamificationHelper gamificationHelper;
 
+    @Autowired
+    private DashboardService dashboardService;
+
     @GetMapping("api/user/balance")
     @ApiOperation(value = "Get user balance")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
@@ -37,6 +40,15 @@ public class UserController {
         UserBalanceResponse balance = userBalanceService.getUserBalance(userInformation.getUserID());
 
         return new ApiResponse<>("successfully get user balance", balance);
+
+    }
+
+    @GetMapping("api/user/web")
+    @ApiOperation(value = "Get user information for web dashboard")
+    public ApiResponse<WebDashboardResponse> getUserDashboardWebInformation(@RequestParam(name = "graph_filter") DateFilter dateFilter) {
+        WebDashboardResponse res = dashboardService.webDashboard(dateFilter);
+
+        return new ApiResponse<>("successfully get user balance", res);
 
     }
 
