@@ -99,6 +99,8 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
+        String profilePicture = "https://m.udustars.com/content/themes/default/images/blank_profile.jpg";
+
         User userResult = userRepository.save(
                 User
                         .builder()
@@ -108,6 +110,7 @@ public class AuthServiceImpl implements AuthService {
                         .telephone(signUpRequest.getTelephone())
                         .balance(signUpRequest.getBalance())
                         .fullName(signUpRequest.getFullName())
+                        .profilePicture(profilePicture)
                         .pin(signUpRequest.getPin())
                         .roles(roles)
                         .build()
