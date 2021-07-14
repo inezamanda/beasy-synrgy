@@ -30,7 +30,7 @@ public class TransferController {
         TransferResponse transferResult = transferService.transfer(
                 TransferRequest
                         .builder()
-                        .contact_id(transferRequest.getContact_id())
+                        .contactId(transferRequest.getContactId())
                         .amount(transferRequest.getAmount())
                         .note(transferRequest.getNote())
                         .pin(transferRequest.getPin())

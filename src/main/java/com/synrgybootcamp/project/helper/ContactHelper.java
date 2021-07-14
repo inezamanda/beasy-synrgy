@@ -32,9 +32,9 @@ public class ContactHelper {
                         .builder()
                         .id(contact.getId())
                         .name(contact.getName())
-                        .account_number(contact.getAccountNumber())
-                        .bank_id(contact.getBank().getId())
-                        .bank_name(contact.getBank().getName())
+                        .accountNumber(contact.getAccountNumber())
+                        .bankId(contact.getBank().getId())
+                        .bankName(contact.getBank().getName())
                         .cost(contact.getBank().getPrimary() ? 0 : TransactionConstants.DIFFERENT_BANK_FEE)
                         .build()
                 ).collect(Collectors.toList());

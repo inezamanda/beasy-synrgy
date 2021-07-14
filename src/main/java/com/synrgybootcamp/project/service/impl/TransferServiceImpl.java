@@ -62,7 +62,7 @@ public class TransferServiceImpl implements TransferService {
         if (!(transferRequest.getPin().equals(user.getPin())))
             throw new ApiException(HttpStatus.NOT_FOUND, "wrong pin");
 
-        Contact contact = contactRepository.findById(transferRequest.getContact_id())
+        Contact contact = contactRepository.findById(transferRequest.getContactId())
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "contact not found"));
 
         Integer cost = getTransferCost(user, contact);
@@ -155,10 +155,10 @@ public class TransferServiceImpl implements TransferService {
         List<UserReward> rewards  = userRewardRepository.findByUserIdAndClaimedTrueAndExpiredAtBefore(user.getId(), DateUtils.addMonths(new Date(), 1));
 
         UserReward reward = rewards.stream()
-            .filter(userReward ->
-                userReward.getRewardPlanet().getType().equals(RewardPlanetType.TRANSFER))
-            .findFirst()
-            .orElse(null);
+                .filter(userReward ->
+                        userReward.getRewardPlanet().getType().equals(RewardPlanetType.TRANSFER))
+                .findFirst()
+                .orElse(null);
 
         if (Objects.nonNull(reward)) {
             transferCost = 0;
