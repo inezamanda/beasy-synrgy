@@ -1,5 +1,6 @@
 package com.synrgybootcamp.project.web.model.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BankResponse {
-    String bank_id;
-    String bank_name;
+    @JsonProperty("bank_id")
+    String bankId;
+    @JsonProperty("bank_name")
+    String bankName;
 }

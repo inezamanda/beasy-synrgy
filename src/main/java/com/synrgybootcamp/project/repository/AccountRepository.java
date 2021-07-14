@@ -10,4 +10,5 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     List<Account> findByNameIsContainingIgnoreCaseAndUser(String name, User user);
     List<Account> findByAccountNumberContainingIgnoreCaseAndUserAndIdNotIn(String accountNumber, User user, List<String> ids);
     List<Account> findByUser(User user);
+    boolean existsByUserAndNameOrUserAndAccountNumber(User user, String name, User userTwo, String accountNumber);
 }

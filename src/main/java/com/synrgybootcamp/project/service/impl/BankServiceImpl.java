@@ -22,8 +22,8 @@ public class BankServiceImpl implements BankService {
                 .stream()
                 .map(bank -> BankResponse
                         .builder()
-                        .bank_id(bank.getId())
-                        .bank_name(bank.getName())
+                        .bankId(bank.getId())
+                        .bankName(bank.getName())
                         .build())
                 .collect(Collectors.toList()
                 );

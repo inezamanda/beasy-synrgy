@@ -71,9 +71,9 @@ public class ContactServiceImpl implements ContactService {
                         .builder()
                         .id(contact.getId())
                         .name(contact.getName())
-                        .account_number(contact.getAccountNumber())
-                        .bank_id(contact.getBank().getId())
-                        .bank_name(contact.getBank().getName())
+                        .accountNumber(contact.getAccountNumber())
+                        .bankId(contact.getBank().getId())
+                        .bankName(contact.getBank().getName())
                         .cost(contact.getBank().getPrimary() ? 0 : TransactionConstants.DIFFERENT_BANK_FEE)
                         .build()
                 ).collect(Collectors.toList());
@@ -95,16 +95,20 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public ContactResponse createContact(ContactRequest contactRequest) {
-        Bank bank = bankRepository.findById(contactRequest.getBank_id())
+        Bank bank = bankRepository.findById(contactRequest.getBankId())
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "Bank tidak ditemukan"));
 
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
 
+        if (contactRepository.existsByUserAndNameOrUserAndAccountNumber(user, contactRequest.getName(), user, contactRequest.getAccountNumber())){
+            throw new ApiException(HttpStatus.BAD_REQUEST, "There is a contact with the same name / account number");
+        }
+
         Contact contact = contactRepository.save(
                 Contact.builder()
                         .name(contactRequest.getName())
-                        .accountNumber(contactRequest.getAccount_number())
+                        .accountNumber(contactRequest.getAccountNumber())
                         .bank(bank)
                         .user(user)
                         .build()
@@ -113,9 +117,9 @@ public class ContactServiceImpl implements ContactService {
         return ContactResponse.builder()
                 .id(contact.getId())
                 .name(contact.getName())
-                .account_number(contact.getAccountNumber())
-                .bank_id(bank.getId())
-                .bank_name(bank.getName())
+                .accountNumber(contact.getAccountNumber())
+                .bankId(bank.getId())
+                .bankName(bank.getName())
                 .cost(contact.getBank().getPrimary() ? 0 : TransactionConstants.DIFFERENT_BANK_FEE)
                 .build();
     }
@@ -130,9 +134,9 @@ public class ContactServiceImpl implements ContactService {
                 .builder()
                 .id(contact.getId())
                 .name(contact.getName())
-                .account_number(contact.getAccountNumber())
-                .bank_id(contact.getBank().getId())
-                .bank_name(contact.getBank().getName())
+                .accountNumber(contact.getAccountNumber())
+                .bankId(contact.getBank().getId())
+                .bankName(contact.getBank().getName())
                 .cost(contact.getBank().getPrimary() ? 0 : TransactionConstants.DIFFERENT_BANK_FEE)
                 .build();
     }
@@ -142,21 +146,30 @@ public class ContactServiceImpl implements ContactService {
         Contact contact = contactRepository.findById(id)
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "Contact tidak ditemukan"));
 
-        Bank bank = bankRepository.findById(contactRequest.getBank_id())
+        Bank bank = bankRepository.findById(contactRequest.getBankId())
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "Bank tidak ditemukan"));
 
+        User user = userRepository.findById(userInformation.getUserID())
+                .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
+
+        if (contactRepository.existsByUserAndNameOrUserAndAccountNumber(user, contactRequest.getName(), user, contactRequest.getAccountNumber())){
+            throw new ApiException(HttpStatus.BAD_REQUEST, "There is a contact with the same name / account number");
+        }
+
         contact.setName(contactRequest.getName());
-        contact.setAccountNumber(contactRequest.getAccount_number());
+        contact.setAccountNumber(contactRequest.getAccountNumber());
         contact.setBank(bank);
 
         Contact contactResult = contactRepository.save(contact);
 
         return ContactResponse
                 .builder()
+                .id(contactResult.getId())
                 .name(contactResult.getName())
-                .account_number(contactResult.getAccountNumber())
-                .bank_id(bank.getId())
-                .bank_name(bank.getName())
+                .cost(contactResult.getBank().getPrimary() ? 0 : TransactionConstants.DIFFERENT_BANK_FEE)
+                .accountNumber(contactResult.getAccountNumber())
+                .bankId(bank.getId())
+                .bankName(bank.getName())
                 .build();
     }
 

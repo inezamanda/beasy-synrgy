@@ -102,6 +102,10 @@ public class AccountServiceImpl implements AccountService {
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
 
+        if (accountRepository.existsByUserAndNameOrUserAndAccountNumber(user, accountRequest.getName(), user, accountRequest.getAccountNumber())){
+            throw new ApiException(HttpStatus.BAD_REQUEST, "There is a account with the same name/ account number");
+        }
+
         Account account = accountRepository.save(
                 Account.builder()
                         .name(accountRequest.getName())
@@ -145,6 +149,13 @@ public class AccountServiceImpl implements AccountService {
         Ewallet ewallet = ewalletRepository.findById(accountRequest.getEwalletId())
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "Ewallet tidak ditemukan"));
 
+        User user = userRepository.findById(userInformation.getUserID())
+                .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
+
+        if (accountRepository.existsByUserAndNameOrUserAndAccountNumber(user, accountRequest.getName(), user, accountRequest.getAccountNumber())){
+            throw new ApiException(HttpStatus.BAD_REQUEST, "There is a account with the same name/ account number");
+        }
+
         account.setName(accountRequest.getName());
         account.setAccountNumber(account.getAccountNumber());
         account.setEwallet(ewallet);
@@ -153,10 +164,12 @@ public class AccountServiceImpl implements AccountService {
 
         return AccountResponse
                 .builder()
+                .id(accountResult.getId())
                 .name(accountResult.getName())
                 .accountNumber(accountResult.getAccountNumber())
                 .ewalletId(ewallet.getId())
                 .ewalletName(ewallet.getName())
+                .adminFee(TransactionConstants.ADMIN_FEE)
                 .build();
     }
 
