@@ -10,14 +10,18 @@ import com.synrgybootcamp.project.security.utility.UserInformation;
 import com.synrgybootcamp.project.service.EwalletTransactionService;
 import com.synrgybootcamp.project.util.ApiException;
 import com.synrgybootcamp.project.web.model.request.EwalletTransactionRequest;
+import com.synrgybootcamp.project.web.model.response.EwalletTransactionHistoryResponse;
 import com.synrgybootcamp.project.web.model.response.EwalletTransactionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 @Service
 public class EwalletTransactionServiceImpl implements EwalletTransactionService {
@@ -106,5 +110,23 @@ public class EwalletTransactionServiceImpl implements EwalletTransactionService 
                 .totalTransfer(ewalletTransaction.getAmount() + ewalletTransaction.getAdminFee())
                 .refCode(transaction.getId())
                 .build();
+    }
+
+    @Override
+    public List<EwalletTransactionHistoryResponse> getHistory(Sort sort) {
+        User user = userRepository.findById(userInformation.getUserID())
+                .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "user not found"));
+
+        return ewalletTransactionRepository.findByUser(user, sort)
+                .stream()
+                .map(ewalletTransaction -> EwalletTransactionHistoryResponse
+                        .builder()
+                        .accountName(ewalletTransaction.getAccount().getName())
+                        .ewalletName(ewalletTransaction.getAccount().getEwallet().getName())
+                        .accountNumber(ewalletTransaction.getAccount().getAccountNumber())
+                        .amount(ewalletTransaction.getAmount())
+                        .on(ewalletTransaction.getTransaction().getDate())
+                        .build())
+                .collect(Collectors.toList());
     }
 }
