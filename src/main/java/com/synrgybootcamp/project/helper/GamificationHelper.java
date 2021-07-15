@@ -95,7 +95,11 @@ public class GamificationHelper {
     }
 
     if (Objects.isNull(planet)) {
-      throw new ApiException(HttpStatus.BAD_REQUEST, "You need to start gamification first");
+      return UserGamificationStatusResponse
+          .builder()
+          .startedGamification(false)
+          .gamificationAnimation(GamificationConstant.NOT_YET_STARTED_GAMIFICATION_ANIMATION)
+          .build();
     }
 
     UserGamificationStatusResponse.UserGamificationStatusResponseBuilder res = UserGamificationStatusResponse.builder()
@@ -105,6 +109,8 @@ public class GamificationHelper {
         .planetSequence(planet.getSequence())
         .planetWording(planet.getWording())
         .onCompletionDelay(onCompletionDelay)
+        .gamificationAnimation(planet.getAnimation())
+        .startedGamification(true)
         .recentPlanetCompletionDelayFinished(recentPlanetCompletionDelayFinished);
 
     boolean isOnLastPlanet = planet.getSequence() == GamificationConstant.LAST_PLANET_SEQUENCE;
@@ -114,6 +120,9 @@ public class GamificationHelper {
       List<Mission> lastPlanetMission = missionRepository.findByPlanet(lastPlanet);
       long completedLastPlanetMission = getTotalCompletedPlanetMission(lastPlanetMission);
       isCompletedGamification = completedLastPlanetMission >= GamificationConstant.MINIMUM_COMPLETED_MISSION;
+      if (isCompletedGamification) {
+        res.gamificationAnimation(GamificationConstant.FINISHED_GAMIFICATION_ANIMATION);
+      }
     } else {
       Planet nextPlanet = planetRepository.findFirstBySequence(planet.getSequence() + 1).orElse(getUser().getPlanet());
       res.nextPlanetId(nextPlanet.getId())

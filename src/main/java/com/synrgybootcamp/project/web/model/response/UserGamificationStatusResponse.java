@@ -13,7 +13,6 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserGamificationStatusResponse {
 
   @JsonProperty("planet_id")
@@ -46,6 +45,9 @@ public class UserGamificationStatusResponse {
   @JsonProperty("next_planet_wording")
   String nextPlanetWording;
 
+  @JsonProperty("is_started_gamification")
+  boolean startedGamification;
+
   @JsonProperty("is_on_last_planet")
   boolean onLastPlanet;
 
@@ -57,4 +59,7 @@ public class UserGamificationStatusResponse {
 
   @JsonProperty("recent_planet_completion_delay_finished")
   Date recentPlanetCompletionDelayFinished;
+
+  @JsonProperty("gamification_animation")
+  String gamificationAnimation;
 }
