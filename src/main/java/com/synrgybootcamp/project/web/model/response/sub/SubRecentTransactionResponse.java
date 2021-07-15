@@ -19,4 +19,6 @@ public class SubRecentTransactionResponse {
 
   Date date;
 
+  Integer totalAmount;
+
 }
