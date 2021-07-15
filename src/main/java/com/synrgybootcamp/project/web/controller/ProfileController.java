@@ -2,8 +2,11 @@ package com.synrgybootcamp.project.web.controller;
 
 import com.synrgybootcamp.project.service.impl.ProfileServiceImpl;
 import com.synrgybootcamp.project.util.ApiResponse;
-import com.synrgybootcamp.project.web.model.request.ProfileRequest;
-import com.synrgybootcamp.project.web.model.response.ProfileResponse;
+import com.synrgybootcamp.project.web.model.request.MobileProfileRequest;
+import com.synrgybootcamp.project.web.model.request.WebProfileRequest;
+import com.synrgybootcamp.project.web.model.response.MobileProfileResponse;
+import com.synrgybootcamp.project.web.model.response.MobileProfileSettingResponse;
+import com.synrgybootcamp.project.web.model.response.WebProfileResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +24,42 @@ public class ProfileController {
     @GetMapping("/web")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @ApiOperation(value = "Get user profile (Web)")
-    public ApiResponse<ProfileResponse> getUserProfile() {
-        ProfileResponse profileResponse = profileService.getUserProfile();
-        return new ApiResponse<>("Successfully get User Profile", profileResponse);
+    public ApiResponse<WebProfileResponse> getUserProfileWeb() {
+        WebProfileResponse webProfileResponse = profileService.getUserProfileWeb();
+        return new ApiResponse<>("Successfully get User Profile", webProfileResponse);
     }
 
     @PutMapping("/web")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @ApiOperation(value = "Edit user profile (Web)")
-    public ApiResponse<ProfileResponse> editUserProfile(@ModelAttribute ProfileRequest profileRequest) {
-        ProfileResponse profileResponse = profileService.editUserProfile(profileRequest);
+    public ApiResponse<WebProfileResponse> editUserProfileWeb(@ModelAttribute WebProfileRequest webProfileRequest) {
+        WebProfileResponse webProfileResponse = profileService.editUserProfileWeb(webProfileRequest);
 
-        return new ApiResponse<>("Successfuly change User Profile", profileResponse);
+        return new ApiResponse<>("Successfuly change User Profile", webProfileResponse);
+    }
+
+    @GetMapping("/mobile")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    @ApiOperation(value = "Get user profile (Mobile)")
+    public ApiResponse<MobileProfileResponse> getUserProfileMobile() {
+        MobileProfileResponse mobileProfileResponse = profileService.getUserProfileMobile();
+        return new ApiResponse<>("Successfully get User Profile", mobileProfileResponse);
+    }
+
+    @GetMapping("/mobile/setting")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    @ApiOperation(value = "Get user profile setting (Mobile)")
+    public ApiResponse<MobileProfileSettingResponse> getUserProfileSettingMobile() {
+        MobileProfileSettingResponse mobileProfileSettingResponse = profileService.getUserProfileSettingMobile();
+        return new ApiResponse<>("Successfully get User Profile Setting", mobileProfileSettingResponse);
+    }
+
+    @PutMapping("/mobile/setting")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    @ApiOperation(value = "Edit user profile setting (Mobile)")
+    public ApiResponse<MobileProfileSettingResponse> editUserProfileWeb(@ModelAttribute MobileProfileRequest mobileProfileRequest) {
+        MobileProfileSettingResponse mobileProfileSettingResponse = profileService.editUserProfileSettingMobile(mobileProfileRequest);
+
+        return new ApiResponse<>("Successfuly change User Profile", mobileProfileSettingResponse);
     }
 }

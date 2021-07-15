@@ -20,7 +20,7 @@ public class EmailSender {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setFrom("muhammad.21@students.amikom.ac.id");
+            helper.setFrom("support@beasyapp.tech");
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(text,true);

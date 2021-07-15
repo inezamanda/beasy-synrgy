@@ -4,20 +4,19 @@ import com.synrgybootcamp.project.entity.Pocket;
 import com.synrgybootcamp.project.entity.Role;
 import com.synrgybootcamp.project.entity.User;
 import com.synrgybootcamp.project.enums.RoleName;
-import com.synrgybootcamp.project.helper.GamificationHelper;
 import com.synrgybootcamp.project.repository.PocketRepository;
 import com.synrgybootcamp.project.repository.RoleRepository;
 import com.synrgybootcamp.project.repository.UserRepository;
 import com.synrgybootcamp.project.security.utility.JwtTokenUtility;
 import com.synrgybootcamp.project.service.AuthService;
 import com.synrgybootcamp.project.util.ApiException;
+import com.synrgybootcamp.project.util.DebitCardUtil;
 import com.synrgybootcamp.project.util.EmailSender;
 import com.synrgybootcamp.project.web.model.request.ChangePasswordRequest;
 import com.synrgybootcamp.project.web.model.request.ForgotPasswordRequest;
 import com.synrgybootcamp.project.web.model.request.SignInRequest;
 import com.synrgybootcamp.project.web.model.request.SignUpRequest;
 import com.synrgybootcamp.project.web.model.response.SignInResponse;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -54,6 +54,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private EmailSender emailSender;
+
+    @Autowired
+    private DebitCardUtil debitCardUtil;
 
     @Override
     public SignInResponse signIn(SignInRequest signInRequest) {
@@ -100,6 +103,8 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String profilePicture = "https://m.udustars.com/content/themes/default/images/blank_profile.jpg";
+        String cardNumber = debitCardUtil.generate();
+        Date expiryDate = debitCardUtil.expiryDate();
 
         User userResult = userRepository.save(
                 User
@@ -112,6 +117,8 @@ public class AuthServiceImpl implements AuthService {
                         .fullName(signUpRequest.getFullName())
                         .profilePicture(profilePicture)
                         .pin(signUpRequest.getPin())
+                        .cardNumber(cardNumber)
+                        .expiryDate(expiryDate)
                         .roles(roles)
                         .build()
         );

@@ -50,6 +50,12 @@ public class User {
     @Column(name = "pin", length = 6)
     private Integer pin;
 
+    @Column(name = "card_number")
+    private String cardNumber;
+
+    @Column(name = "card_expire_date")
+    private Date expiryDate;
+
     @Column(name = "verif_code")
     private String verifCode;
 
@@ -101,6 +107,10 @@ public class User {
     @OneToMany
     @JoinColumn(name = "user_id")
     private List<CreditCardBill> creditCardBills;
+
+    @OneToMany
+    @JoinColumn(name = "user_id")
+    private List<Help> helps;
 
     @Override
     public boolean equals(Object o) {
