@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.summingInt;
@@ -54,12 +55,20 @@ public class DashboardServiceImpl implements DashboardService {
 
     SubWebGraphResponse graph = generateGraphData(dateFilter, loggedInUser);
     SubRecentTransactionResponse mostRecentTransaction = generateMostRecenTransactionData(loggedInUser);
+
+    Integer lastFourDigit = Optional.of(loggedInUser).map(User::getCardNumber)
+        .map(num -> num.substring(num.length() - 5, num.length() - 1))
+        .map(Integer::parseInt)
+        .orElse(1234);
+    Calendar expiredAt = Calendar.getInstance();
+    expiredAt.setTime(loggedInUser.getExpiryDate());
+
     SubCardInfoResponse card = SubCardInfoResponse
         .builder()
         .balance(totalBalance)
         .cardHolderName(loggedInUser.getFullName())
-        .lastFourDigit(1234)
-        .expiredAt("12/24")
+        .lastFourDigit(lastFourDigit)
+        .expiredAt(expiredAt.get(Calendar.MONTH) + "/" + expiredAt.get(Calendar.YEAR))
         .build();
 
     return WebDashboardResponse.builder()
@@ -141,6 +150,7 @@ public class DashboardServiceImpl implements DashboardService {
         .name(data.getType().getTextDisplay())
         .logo(ImageUtil.getImageFromTransactionType(data.getType()))
         .date(data.getDate())
+        .totalAmount(data.getTotalAmount())
         .build()).orElse(null);
   }
 }
