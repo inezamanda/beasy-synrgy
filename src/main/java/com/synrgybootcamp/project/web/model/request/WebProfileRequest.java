@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProfileRequest {
+public class WebProfileRequest {
     @JsonProperty("profile_picture")
     @Nullable
     private MultipartFile profilePicture;
