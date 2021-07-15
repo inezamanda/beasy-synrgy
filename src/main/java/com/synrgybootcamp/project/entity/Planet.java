@@ -38,6 +38,9 @@ public class Planet {
     @Column(name = "wording")
     private String wording;
 
+    @Column(name = "animation")
+    private String animation;
+
     @OneToOne(mappedBy = "planet")
     private RewardPlanet rewardPlanet;
 
