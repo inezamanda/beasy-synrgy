@@ -9,8 +9,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,6 +48,6 @@ public class TransferController {
         List<TransferHistoryResponse> transferResponses = transferService.getHistory(
                 sortOrder.equals("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending());
 
-        return new ApiResponse<>("successfully get history pocket", transferResponses);
+        return new ApiResponse<>("successfully get transfer history", transferResponses);
     }
 }
