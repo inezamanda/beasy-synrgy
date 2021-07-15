@@ -68,7 +68,7 @@ public class DashboardServiceImpl implements DashboardService {
         .balance(totalBalance)
         .cardHolderName(loggedInUser.getFullName())
         .lastFourDigit(lastFourDigit)
-        .expiredAt(expiredAt.get(Calendar.YEAR) + "/" + expiredAt.get(Calendar.MONTH))
+        .expiredAt(expiredAt.get(Calendar.MONTH) + "/" + expiredAt.get(Calendar.YEAR))
         .build();
 
     return WebDashboardResponse.builder()
