@@ -57,7 +57,7 @@ public class ProfileController {
     @PutMapping("/mobile/setting")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @ApiOperation(value = "Edit user profile setting (Mobile)")
-    public ApiResponse<MobileProfileSettingResponse> editUserProfileWeb(@ModelAttribute MobileProfileRequest mobileProfileRequest) {
+    public ApiResponse<MobileProfileSettingResponse> editUserProfileWeb(@RequestBody MobileProfileRequest mobileProfileRequest) {
         MobileProfileSettingResponse mobileProfileSettingResponse = profileService.editUserProfileSettingMobile(mobileProfileRequest);
 
         return new ApiResponse<>("Successfuly change User Profile", mobileProfileSettingResponse);
