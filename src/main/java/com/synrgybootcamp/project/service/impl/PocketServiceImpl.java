@@ -134,10 +134,10 @@ public class PocketServiceImpl implements PocketService {
         List<Pocket> pockets;
         if (withPrimary) {
             pockets = pocketRepository
-                .findPocketsByUserIdOrderByDueDate(userInformation.getUserID());
+                .findPocketsByUserIdAndDeleteFalseOrderByDueDate(userInformation.getUserID());
         } else {
             pockets = pocketRepository
-                .findPocketsByUserIdAndPrimaryFalseOrderByDueDate(userInformation.getUserID());
+                .findPocketsByUserIdAndDeleteFalseAndPrimaryFalseOrderByDueDate(userInformation.getUserID());
         }
 
             return pockets.stream()
@@ -148,7 +148,7 @@ public class PocketServiceImpl implements PocketService {
                             .picture(p.getPicture())
                             .pocketName(p.getName())
                             .primary(p.getPrimary())
-                            .target(p.getTarget())
+                            .target(Objects.nonNull(p.getTarget()) ? p.getTarget() : 0)
                             .balance(p.getBalance())
                             .dueDate(p.getDueDate())
                             .build()
