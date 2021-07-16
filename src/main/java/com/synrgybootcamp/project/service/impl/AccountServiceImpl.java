@@ -152,8 +152,8 @@ public class AccountServiceImpl implements AccountService {
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
 
-        if (accountRepository.existsByUserAndNameOrUserAndAccountNumber(user, accountRequest.getName(), user, accountRequest.getAccountNumber())){
-            throw new ApiException(HttpStatus.BAD_REQUEST, "There is a account with the same name/ account number");
+        if (accountRepository.existsByUserAndNameAndIdNotOrUserAndAccountNumberAndIdNot(user, accountRequest.getName(), id, user, accountRequest.getAccountNumber(), id)){
+            throw new ApiException(HttpStatus.BAD_REQUEST, "There is a account with the same name / account number");
         }
 
         account.setName(accountRequest.getName());

@@ -152,7 +152,7 @@ public class ContactServiceImpl implements ContactService {
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
 
-        if (contactRepository.existsByUserAndNameOrUserAndAccountNumber(user, contactRequest.getName(), user, contactRequest.getAccountNumber())){
+        if (contactRepository.existsByUserAndNameAndIdNotOrUserAndAccountNumberAndIdNot(user, contactRequest.getName(), id, user, contactRequest.getAccountNumber(), id)){
             throw new ApiException(HttpStatus.BAD_REQUEST, "There is a contact with the same name / account number");
         }
 
