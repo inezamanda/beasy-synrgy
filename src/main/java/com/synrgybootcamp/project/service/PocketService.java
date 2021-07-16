@@ -17,7 +17,7 @@ import java.util.List;
 
 public interface PocketService {
     PocketResponse createPocket(PocketRequest pocketRequest);
-    List<PocketResponse> getAllPocket();
+    List<PocketResponse> getAllPocket(boolean withPrimary);
     PocketResponse getDetailPocketByID(String id);
     PocketResponse updatePocketById(String id,PocketRequest pocketRequest);
     boolean deletePocketById(String id);
