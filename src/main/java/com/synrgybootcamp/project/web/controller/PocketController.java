@@ -39,9 +39,9 @@ public class PocketController {
     @GetMapping("")
     @ApiOperation(value = "Get list of pockets")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ApiResponse<List<PocketResponse>> getAllPockets(){
+    public ApiResponse<List<PocketResponse>> getAllPockets(@RequestParam(name = "with_primary", defaultValue = "false") boolean withPrimary){
 
-        List<PocketResponse> pocketResponse = pocketService.getAllPocket();
+        List<PocketResponse> pocketResponse = pocketService.getAllPocket(withPrimary);
 
         return new ApiResponse<>("successfully get pocket user", pocketResponse);
     }

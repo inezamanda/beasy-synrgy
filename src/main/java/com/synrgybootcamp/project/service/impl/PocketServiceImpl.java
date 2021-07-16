@@ -29,8 +29,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -128,9 +130,9 @@ public class PocketServiceImpl implements PocketService {
     }
 
     @Override
-    public List<PocketResponse> getAllPocket() {
-
-        List<Pocket> pockets = pocketRepository.findDeletedPocket(userInformation.getUserID());
+    public List<PocketResponse> getAllPocket(boolean withPrimary) {
+        List<Pocket> pockets = pocketRepository
+            .findPocketsByUserIdAndPrimaryOrderByDueDate(userInformation.getUserID(), withPrimary);
 
             return pockets.stream()
                     .map(p -> PocketResponse

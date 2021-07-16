@@ -50,6 +50,9 @@ public class Pocket {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
+    @Column(name = "user_id", insertable = false, updatable = false)
+    private String userId;
+
     @OneToMany
     @JoinColumn(name = "pocket_id")
     private List<PocketTransaction> pocketTransactions;
