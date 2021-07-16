@@ -131,8 +131,14 @@ public class PocketServiceImpl implements PocketService {
 
     @Override
     public List<PocketResponse> getAllPocket(boolean withPrimary) {
-        List<Pocket> pockets = pocketRepository
-            .findPocketsByUserIdAndPrimaryOrderByDueDate(userInformation.getUserID(), withPrimary);
+        List<Pocket> pockets;
+        if (withPrimary) {
+            pockets = pocketRepository
+                .findPocketsByUserIdOrderByDueDate(userInformation.getUserID());
+        } else {
+            pockets = pocketRepository
+                .findPocketsByUserIdAndPrimaryFalseOrderByDueDate(userInformation.getUserID());
+        }
 
             return pockets.stream()
                     .map(p -> PocketResponse
