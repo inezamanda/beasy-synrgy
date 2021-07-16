@@ -14,6 +14,7 @@ public interface PocketRepository extends JpaRepository<Pocket, String> {
             , nativeQuery = true)
     Optional<Pocket> findPrimaryPocket(@Param("userId") String userId);
     List<Pocket> findByUser(User user);
-    List<Pocket> findPocketsByUserIdAndPrimaryOrderByDueDate(String userId, boolean primary);
+    List<Pocket> findPocketsByUserIdAndPrimaryFalseOrderByDueDate(String userId);
+    List<Pocket> findPocketsByUserIdOrderByDueDate(String userId);
 
 }
