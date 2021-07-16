@@ -11,4 +11,5 @@ public interface ContactRepository extends JpaRepository<Contact, String> {
     List<Contact> findByAccountNumberContainingIgnoreCaseAndUserAndIdNotIn(String accountNumber, User user, List<String> ids);
     List<Contact> findByUser(User user);
     boolean existsByUserAndNameOrUserAndAccountNumber(User user, String name, User userTwo, String accountNumber);
+    boolean existsByUserAndNameAndIdNotOrUserAndAccountNumberAndIdNot(User user, String name, String id, User userTwo, String accountNumber, String idTwo);
 }
