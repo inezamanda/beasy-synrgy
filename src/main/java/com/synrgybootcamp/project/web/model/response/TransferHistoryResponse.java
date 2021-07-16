@@ -25,6 +25,6 @@ public class TransferHistoryResponse {
 
     Integer amount;
 
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss", timezone = "GMT+7")
+    @JsonFormat(pattern = "dd/MM/yyyy")
     Date on;
 }
