@@ -157,7 +157,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         account.setName(accountRequest.getName());
-        account.setAccountNumber(account.getAccountNumber());
+        account.setAccountNumber(accountRequest.getAccountNumber());
         account.setEwallet(ewallet);
 
         Account accountResult = accountRepository.save(account);
