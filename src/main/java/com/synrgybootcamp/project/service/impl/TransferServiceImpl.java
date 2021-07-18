@@ -132,8 +132,9 @@ public class TransferServiceImpl implements TransferService {
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "user not found"));
 
-        return transferRepository.findByUser(user, sort)
+        return transactionRepository.findByUserAndType(user, TransactionType.TRANSFER, sort)
                 .stream()
+                .map(Transaction::getTransfer)
                 .map(transfer -> TransferHistoryResponse
                         .builder()
                         .accountName(transfer.getContact().getName())

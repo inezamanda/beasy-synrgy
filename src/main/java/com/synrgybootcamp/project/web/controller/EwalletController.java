@@ -50,7 +50,7 @@ public class EwalletController {
     @ApiOperation(value = "Get history of ewallet transaction")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ApiResponse<List<EwalletTransactionHistoryResponse>> getHistoryEwalletTransaction(
-            @RequestParam(name = "sort_by", defaultValue = "id") String sortBy,
+            @RequestParam(name = "sort_by", defaultValue = "date") String sortBy,
             @RequestParam(name = "sort_order", defaultValue = "desc") String sortOrder
     ){
         List<EwalletTransactionHistoryResponse> result = ewalletTransactionService.getHistory(
