@@ -117,8 +117,9 @@ public class EwalletTransactionServiceImpl implements EwalletTransactionService 
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "user not found"));
 
-        return ewalletTransactionRepository.findByUser(user, sort)
+        return transactionRepository.findByUserAndType(user, TransactionType.EWALLET, sort)
                 .stream()
+                .map(Transaction::getEwalletTransaction)
                 .map(ewalletTransaction -> EwalletTransactionHistoryResponse
                         .builder()
                         .accountName(ewalletTransaction.getAccount().getName())
