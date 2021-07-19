@@ -21,10 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -137,9 +134,9 @@ public class TransferServiceImpl implements TransferService {
                 .map(Transaction::getTransfer)
                 .map(transfer -> TransferHistoryResponse
                         .builder()
-                        .accountName(transfer.getContact().getName())
-                        .bankName(transfer.getContact().getBank().getName())
-                        .beneficiaryAccountNumber(transfer.getContact().getAccountNumber())
+                        .accountName(Optional.ofNullable(transfer.getContact()).map(Contact::getName).orElse(""))
+                        .bankName(Optional.ofNullable(transfer.getContact()).map(Contact::getBank).map(Bank::getName).orElse(""))
+                        .beneficiaryAccountNumber(Optional.ofNullable(transfer.getContact()).map(Contact::getAccountNumber).orElse(""))
                         .amount(transfer.getAmount())
                         .on(transfer.getTransaction().getDate())
                         .build())

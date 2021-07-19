@@ -25,6 +25,6 @@ public class EwalletTransactionHistoryResponse {
 
     Integer amount;
 
-    @JsonFormat(pattern = "dd/MM/yyyy")
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss", timezone = "GMT+7")
     Date on;
 }
