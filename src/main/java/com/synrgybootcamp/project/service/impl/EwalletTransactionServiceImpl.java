@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
@@ -122,9 +123,9 @@ public class EwalletTransactionServiceImpl implements EwalletTransactionService 
                 .map(Transaction::getEwalletTransaction)
                 .map(ewalletTransaction -> EwalletTransactionHistoryResponse
                         .builder()
-                        .accountName(ewalletTransaction.getAccount().getName())
-                        .ewalletName(ewalletTransaction.getAccount().getEwallet().getName())
-                        .accountNumber(ewalletTransaction.getAccount().getAccountNumber())
+                        .accountName(Optional.ofNullable(ewalletTransaction.getAccount()).map(Account::getName).orElse(""))
+                        .ewalletName(Optional.ofNullable(ewalletTransaction.getAccount()).map(Account::getEwallet).map(Ewallet::getName).orElse(""))
+                        .accountNumber(Optional.of(ewalletTransaction.getAccount()).map(Account::getAccountNumber).orElse(""))
                         .amount(ewalletTransaction.getAmount())
                         .on(ewalletTransaction.getTransaction().getDate())
                         .build())
