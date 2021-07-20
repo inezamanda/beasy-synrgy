@@ -16,7 +16,7 @@ public class AccountHelper {
 
         accounts.stream().forEach(account -> {
             if (recentAccounts.size() < 3) {
-                if (!CollectionUtils.contains(recentAccounts.iterator(), account)) {
+                if (!CollectionUtils.contains(recentAccounts.iterator(), account) && !account.getDelete()) {
                     recentAccounts.add(account);
                 }
             }
