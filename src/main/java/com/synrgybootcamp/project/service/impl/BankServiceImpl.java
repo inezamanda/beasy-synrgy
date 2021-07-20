@@ -5,6 +5,7 @@ import com.synrgybootcamp.project.repository.BankRepository;
 import com.synrgybootcamp.project.service.BankService;
 import com.synrgybootcamp.project.web.model.response.BankResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class BankServiceImpl implements BankService {
 
     @Override
     public List<BankResponse> getAllBanks() {
-        List<Bank> pagedBank = bankRepository.findAll();
+        List<Bank> pagedBank = bankRepository.findAll(Sort.by("primary").descending());
         return pagedBank
                 .stream()
                 .map(bank -> BankResponse
