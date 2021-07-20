@@ -110,6 +110,12 @@ public class ContactServiceImpl implements ContactService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "There is a contact with the same name / account number");
         }
 
+        if (bank.getPrimary()) {
+            if(!(userRepository.existsByAccountNumber(contactRequest.getAccountNumber()))) {
+                throw new ApiException(HttpStatus.NOT_FOUND, "There is no beasy account with inputed account number registered");
+            }
+        }
+
         Contact contact = contactRepository.save(
                 Contact.builder()
                         .name(contactRequest.getName())
@@ -160,6 +166,12 @@ public class ContactServiceImpl implements ContactService {
 
         if (contactRepository.existsByUserAndNameAndIdNotAndDeleteIsFalseOrUserAndAccountNumberAndIdNotAndDeleteIsFalse(user, contactRequest.getName(), id, user, contactRequest.getAccountNumber(), id)){
             throw new ApiException(HttpStatus.BAD_REQUEST, "There is a contact with the same name / account number");
+        }
+
+        if (bank.getPrimary()) {
+            if(!(userRepository.existsByAccountNumber(contactRequest.getAccountNumber()))) {
+                throw new ApiException(HttpStatus.NOT_FOUND, "There is no beasy account with inputed account number registered");
+            }
         }
 
         contact.setName(contactRequest.getName());

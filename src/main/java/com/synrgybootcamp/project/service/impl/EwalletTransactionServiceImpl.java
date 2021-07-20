@@ -125,7 +125,7 @@ public class EwalletTransactionServiceImpl implements EwalletTransactionService 
                         .builder()
                         .accountName(Optional.ofNullable(ewalletTransaction.getAccount()).map(Account::getName).orElse(""))
                         .ewalletName(Optional.ofNullable(ewalletTransaction.getAccount()).map(Account::getEwallet).map(Ewallet::getName).orElse(""))
-                        .accountNumber(Optional.of(ewalletTransaction.getAccount()).map(Account::getAccountNumber).orElse(""))
+                        .accountNumber(Optional.ofNullable(ewalletTransaction.getAccount()).map(Account::getAccountNumber).orElse(""))
                         .amount(ewalletTransaction.getAmount())
                         .on(ewalletTransaction.getTransaction().getDate())
                         .build())
