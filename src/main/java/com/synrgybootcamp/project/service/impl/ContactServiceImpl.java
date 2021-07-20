@@ -70,6 +70,8 @@ public class ContactServiceImpl implements ContactService {
                     .collect(Collectors.toList());
         }
 
+        UserReward reward = getReward();
+
         return contacts
                 .stream()
                 .map(contact -> ContactResponse
@@ -79,7 +81,7 @@ public class ContactServiceImpl implements ContactService {
                         .accountNumber(contact.getAccountNumber())
                         .bankId(contact.getBank().getId())
                         .bankName(contact.getBank().getName())
-                        .cost(contact.getBank().getPrimary() ? 0 : TransactionConstants.DIFFERENT_BANK_FEE)
+                        .cost(!contact.getBank().getPrimary() ? (Objects.nonNull(reward) ? 0 : TransactionConstants.DIFFERENT_BANK_FEE) : 0)
                         .build()
                 ).collect(Collectors.toList());
     }
@@ -202,18 +204,26 @@ public class ContactServiceImpl implements ContactService {
     }
 
     private Integer getTransferCost(Contact contact) {
-        if (!contact.getBank().getPrimary()) return TransactionConstants.DIFFERENT_BANK_FEE;
+        int transferCost = 0;
 
+        if (!contact.getBank().getPrimary()) {
+            transferCost = TransactionConstants.DIFFERENT_BANK_FEE;
+        }
+
+        UserReward reward = getReward();
+
+        if (Objects.nonNull(reward)) transferCost = 0;
+
+        return transferCost;
+    }
+
+    private UserReward getReward() {
         List<UserReward> rewards  = userRewardRepository.findByUserIdAndClaimedTrueAndExpiredAtAfter(userInformation.getUserID(), new Date());
 
-        UserReward reward = rewards.stream()
-            .filter(userReward ->
-                userReward.getRewardPlanet().getType().equals(RewardPlanetType.TRANSFER))
+        return rewards.stream()
+            .filter(userReward -> userReward.getRewardPlanet().getType().equals(RewardPlanetType.TRANSFER))
+            .filter(userReward -> userReward.getTotalUsed() < userReward.getRewardPlanet().getAmount())
             .findFirst()
             .orElse(null);
-
-        if (Objects.nonNull(reward)) return 0;
-
-        return TransactionConstants.DIFFERENT_BANK_FEE;
     }
 }

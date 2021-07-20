@@ -78,7 +78,7 @@ public class GamificationPlanetRewardServiceImpl implements GamificationPlanetRe
 
     @Override
     public ClaimGamificationRewardResponse claimGamificationReward(String rewardId) {
-        UserReward userReward = userRewardRepository.findByUserIdAndRewardId(userInformation.getUserID(), rewardId)
+        UserReward userReward = userRewardRepository.findByUserIdAndRewardIdAndClaimedFalse(userInformation.getUserID(), rewardId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user tidak memiliki reward tersebut"));
         userReward.setClaimed(true);
         userReward.setExpiredAt(DateUtils.addMonths(new Date(), 1));

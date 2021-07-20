@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface UserRewardRepository extends JpaRepository<UserReward, String> {
   List<UserReward> findByUserIdAndClaimedFalse(String userId);
-  Optional<UserReward> findByUserIdAndRewardId(String userId, String rewardId);
+  Optional<UserReward> findByUserIdAndRewardIdAndClaimedFalse(String userId, String rewardId);
   List<UserReward> findByUserIdAndClaimedTrueAndExpiredAtAfter(String userId, Date maximumExpiredAt);
 
 }
