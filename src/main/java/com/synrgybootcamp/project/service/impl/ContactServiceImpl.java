@@ -47,10 +47,10 @@ public class ContactServiceImpl implements ContactService {
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
 
         if (keyword == null) {
-            contacts = contactRepository.findByUser(loggedInUser);
+            contacts = contactRepository.findByUserAndDeleteFalse(loggedInUser);
         } else {
             List<Contact> contactsResultByName = contactRepository.
-                    findByNameIsContainingIgnoreCaseAndUser(keyword, loggedInUser);
+                    findByNameIsContainingIgnoreCaseAndUserAndDeleteIsFalse(keyword, loggedInUser);
 
             List<String> ids = Optional.ofNullable(contactsResultByName)
                     .filter(val -> !CollectionUtils.isEmpty(val))
@@ -58,7 +58,7 @@ public class ContactServiceImpl implements ContactService {
                     .orElse(Arrays.asList("-"));
 
             List<Contact> contactsResultByAccountNumber = contactRepository
-                    .findByAccountNumberContainingIgnoreCaseAndUserAndIdNotIn(keyword, loggedInUser, ids);
+                    .findByAccountNumberContainingIgnoreCaseAndUserAndIdNotInAndDeleteIsFalse(keyword, loggedInUser, ids);
 
             contacts = Stream
                     .concat(contactsResultByName.stream(), contactsResultByAccountNumber.stream())
@@ -101,7 +101,7 @@ public class ContactServiceImpl implements ContactService {
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
 
-        if (contactRepository.existsByUserAndNameOrUserAndAccountNumber(user, contactRequest.getName(), user, contactRequest.getAccountNumber())){
+        if (contactRepository.existsByUserAndNameAndDeleteIsFalseOrUserAndAccountNumberAndDeleteIsFalse(user, contactRequest.getName(), user, contactRequest.getAccountNumber())){
             throw new ApiException(HttpStatus.BAD_REQUEST, "There is a contact with the same name / account number");
         }
 
@@ -111,6 +111,7 @@ public class ContactServiceImpl implements ContactService {
                         .accountNumber(contactRequest.getAccountNumber())
                         .bank(bank)
                         .user(user)
+                        .delete(false)
                         .build()
         );
 
@@ -152,7 +153,7 @@ public class ContactServiceImpl implements ContactService {
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
 
-        if (contactRepository.existsByUserAndNameAndIdNotOrUserAndAccountNumberAndIdNot(user, contactRequest.getName(), id, user, contactRequest.getAccountNumber(), id)){
+        if (contactRepository.existsByUserAndNameAndIdNotAndDeleteIsFalseOrUserAndAccountNumberAndIdNotAndDeleteIsFalse(user, contactRequest.getName(), id, user, contactRequest.getAccountNumber(), id)){
             throw new ApiException(HttpStatus.BAD_REQUEST, "There is a contact with the same name / account number");
         }
 
@@ -178,7 +179,8 @@ public class ContactServiceImpl implements ContactService {
         Contact contact = contactRepository.findById(id)
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "Contact tidak ditemukan"));
 
-        contactRepository.delete(contact);
+        contact.setDelete(true);
+        contactRepository.save(contact);
         return true;
     }
 }

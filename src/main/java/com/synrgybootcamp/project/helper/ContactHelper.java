@@ -17,7 +17,7 @@ public class ContactHelper {
 
         contacts.stream().forEach(contact -> {
             if (recentContacts.size() < 3) {
-                if (!CollectionUtils.contains(recentContacts.iterator(), contact)) {
+                if (!CollectionUtils.contains(recentContacts.iterator(), contact) && !contact.getDelete()) {
                     recentContacts.add(contact);
                 }
             }

@@ -29,6 +29,9 @@ public class Account {
     @Column(name = "account_number")
     private String accountNumber;
 
+    @Column(name = "is_deleted")
+    private Boolean delete;
+
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;

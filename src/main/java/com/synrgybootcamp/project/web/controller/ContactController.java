@@ -74,6 +74,6 @@ public class ContactController {
     public ApiResponseWithoutData deleteContactById(@PathVariable String id){
         contactService.deleteContactById(id);
 
-        return new ApiResponseWithoutData("contact not found");
+        return new ApiResponseWithoutData("success delete contact");
     }
 }
