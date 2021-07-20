@@ -99,6 +99,7 @@ public class GamificationHelper {
           .builder()
           .startedGamification(false)
           .gamificationAnimation(GamificationConstant.NOT_YET_STARTED_GAMIFICATION_ANIMATION)
+          .planetWording(GamificationConstant.NOT_YET_STARTED_GAMIFICATION_WORDING)
           .build();
     }
 
@@ -122,6 +123,7 @@ public class GamificationHelper {
       isCompletedGamification = completedLastPlanetMission >= GamificationConstant.MINIMUM_COMPLETED_MISSION;
       if (isCompletedGamification) {
         res.gamificationAnimation(GamificationConstant.FINISHED_GAMIFICATION_ANIMATION);
+        res.planetWording(GamificationConstant.FINISHED_GAMIFICATION_WORDING);
       }
     } else {
       Planet nextPlanet = planetRepository.findFirstBySequence(planet.getSequence() + 1).orElse(getUser().getPlanet());

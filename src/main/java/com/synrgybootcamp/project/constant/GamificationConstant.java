@@ -7,4 +7,6 @@ public interface GamificationConstant {
 
   String NOT_YET_STARTED_GAMIFICATION_ANIMATION = "https://res.cloudinary.com/dh9nmeyfy/image/upload/v1626281994/0_i0ezsn.gif";
   String FINISHED_GAMIFICATION_ANIMATION = "https://res.cloudinary.com/dh9nmeyfy/image/upload/v1626281995/19_zgevxj.gif";
+  String NOT_YET_STARTED_GAMIFICATION_WORDING = "\"Let’s go guys, help me to the moon\"";
+  String FINISHED_GAMIFICATION_WORDING = "\"Good job guys, see you next mission\"";
 }
