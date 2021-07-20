@@ -120,11 +120,23 @@ public class DashboardServiceImpl implements DashboardService {
         end.set(end.get(Calendar.YEAR),end.get(Calendar.MONTH),end.get(Calendar.DATE),23,59,59);
         break;
       case WEEK:
-        end.add(Calendar.DAY_OF_MONTH, -7);
+        start.setFirstDayOfWeek(Calendar.MONDAY);
+        start.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        start.set(Calendar.HOUR, 0);
+        start.set(Calendar.MINUTE, 0);
+        start.set(Calendar.SECOND, 0);
+        end.setFirstDayOfWeek(Calendar.MONDAY);
+        end.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        end.add(Calendar.DAY_OF_WEEK, 7);
+        end.set(Calendar.HOUR, 0);
+        end.set(Calendar.MINUTE, 0);
+        end.set(Calendar.SECOND, 0);
         break;
       case MONTH:
         start.set(Calendar.DAY_OF_MONTH, start.getActualMinimum(Calendar.DAY_OF_MONTH));
         end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
+        System.out.println(start.getTime());
+        System.out.println(end.getTime());
         break;
       case YEAR:
         start.set(Calendar.DAY_OF_YEAR, 1);
