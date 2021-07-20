@@ -153,10 +153,10 @@ public class TransferServiceImpl implements TransferService {
         List<UserReward> rewards  = userRewardRepository.findByUserIdAndClaimedTrueAndExpiredAtAfter(user.getId(), new Date());
 
         UserReward reward = rewards.stream()
-                .filter(userReward ->
-                        userReward.getRewardPlanet().getType().equals(RewardPlanetType.TRANSFER))
-                .findFirst()
-                .orElse(null);
+            .filter(userReward -> userReward.getRewardPlanet().getType().equals(RewardPlanetType.TRANSFER))
+            .filter(userReward -> userReward.getTotalUsed() < userReward.getRewardPlanet().getAmount())
+            .findFirst()
+            .orElse(null);
 
         if (Objects.nonNull(reward)) {
             transferCost = 0;
