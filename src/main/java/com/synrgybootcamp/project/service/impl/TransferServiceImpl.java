@@ -150,7 +150,7 @@ public class TransferServiceImpl implements TransferService {
             transferCost = TransactionConstants.DIFFERENT_BANK_FEE;
         }
 
-        List<UserReward> rewards  = userRewardRepository.findByUserIdAndClaimedTrueAndExpiredAtBefore(user.getId(), DateUtils.addMonths(new Date(), 1));
+        List<UserReward> rewards  = userRewardRepository.findByUserIdAndClaimedTrueAndExpiredAtAfter(user.getId(), new Date());
 
         UserReward reward = rewards.stream()
                 .filter(userReward ->

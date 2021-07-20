@@ -2,6 +2,7 @@ package com.synrgybootcamp.project.service.impl;
 
 import com.synrgybootcamp.project.constant.TransactionConstants;
 import com.synrgybootcamp.project.entity.*;
+import com.synrgybootcamp.project.enums.RewardPlanetType;
 import com.synrgybootcamp.project.enums.TransactionType;
 import com.synrgybootcamp.project.helper.ContactHelper;
 import com.synrgybootcamp.project.repository.*;
@@ -11,6 +12,7 @@ import com.synrgybootcamp.project.util.ApiException;
 import com.synrgybootcamp.project.web.model.request.ContactRequest;
 import com.synrgybootcamp.project.web.model.response.ContactResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,9 @@ public class ContactServiceImpl implements ContactService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    UserRewardRepository userRewardRepository;
 
     @Autowired
     TransactionRepository transactionRepository;
@@ -121,7 +126,7 @@ public class ContactServiceImpl implements ContactService {
                 .accountNumber(contact.getAccountNumber())
                 .bankId(bank.getId())
                 .bankName(bank.getName())
-                .cost(contact.getBank().getPrimary() ? 0 : TransactionConstants.DIFFERENT_BANK_FEE)
+                .cost(getTransferCost(contact))
                 .build();
     }
 
@@ -138,7 +143,7 @@ public class ContactServiceImpl implements ContactService {
                 .accountNumber(contact.getAccountNumber())
                 .bankId(contact.getBank().getId())
                 .bankName(contact.getBank().getName())
-                .cost(contact.getBank().getPrimary() ? 0 : TransactionConstants.DIFFERENT_BANK_FEE)
+                .cost(getTransferCost(contact))
                 .build();
     }
 
@@ -167,7 +172,7 @@ public class ContactServiceImpl implements ContactService {
                 .builder()
                 .id(contactResult.getId())
                 .name(contactResult.getName())
-                .cost(contactResult.getBank().getPrimary() ? 0 : TransactionConstants.DIFFERENT_BANK_FEE)
+                .cost(getTransferCost(contact))
                 .accountNumber(contactResult.getAccountNumber())
                 .bankId(bank.getId())
                 .bankName(bank.getName())
@@ -182,5 +187,21 @@ public class ContactServiceImpl implements ContactService {
         contact.setDelete(true);
         contactRepository.save(contact);
         return true;
+    }
+
+    private Integer getTransferCost(Contact contact) {
+        if (!contact.getBank().getPrimary()) return TransactionConstants.DIFFERENT_BANK_FEE;
+
+        List<UserReward> rewards  = userRewardRepository.findByUserIdAndClaimedTrueAndExpiredAtAfter(userInformation.getUserID(), new Date());
+
+        UserReward reward = rewards.stream()
+            .filter(userReward ->
+                userReward.getRewardPlanet().getType().equals(RewardPlanetType.TRANSFER))
+            .findFirst()
+            .orElse(null);
+
+        if (Objects.nonNull(reward)) return 0;
+
+        return TransactionConstants.DIFFERENT_BANK_FEE;
     }
 }
