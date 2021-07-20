@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface AccountRepository extends JpaRepository<Account, String> {
-    List<Account> findByNameIsContainingIgnoreCaseAndUser(String name, User user);
-    List<Account> findByAccountNumberContainingIgnoreCaseAndUserAndIdNotIn(String accountNumber, User user, List<String> ids);
-    List<Account> findByUser(User user);
-    boolean existsByUserAndNameOrUserAndAccountNumber(User user, String name, User userTwo, String accountNumber);
-    boolean existsByUserAndNameAndIdNotOrUserAndAccountNumberAndIdNot(User user, String name, String id, User userTwo, String accountNumber, String idTwo);
+    List<Account> findByNameIsContainingIgnoreCaseAndUserAndDeleteIsFalse(String name, User user);
+    List<Account> findByAccountNumberContainingIgnoreCaseAndUserAndIdNotInAndDeleteIsFalse(String accountNumber, User user, List<String> ids);
+    List<Account> findByUserAndDeleteIsFalse(User user);
+    boolean existsByUserAndNameAndDeleteIsFalseOrUserAndAccountNumberAndDeleteIsFalse(User user, String name, User userTwo, String accountNumber);
+    boolean existsByUserAndNameAndIdNotAndDeleteIsFalseOrUserAndAccountNumberAndIdNotAndDeleteIsFalse(User user, String name, String id, User userTwo, String accountNumber, String idTwo);
 }

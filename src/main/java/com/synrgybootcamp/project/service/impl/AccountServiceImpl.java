@@ -49,10 +49,10 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
 
         if (keyword == null) {
-            accounts = accountRepository.findByUser(loggedInUser);
+            accounts = accountRepository.findByUserAndDeleteIsFalse(loggedInUser);
         } else {
             List<Account> accountsResultByName = accountRepository.
-                    findByNameIsContainingIgnoreCaseAndUser(keyword, loggedInUser);
+                    findByNameIsContainingIgnoreCaseAndUserAndDeleteIsFalse(keyword, loggedInUser);
 
             List<String> ids = Optional.ofNullable(accountsResultByName)
                     .filter(val -> !CollectionUtils.isEmpty(val))
@@ -60,7 +60,7 @@ public class AccountServiceImpl implements AccountService {
                     .orElse(Arrays.asList("-"));
 
             List<Account> accountsResultByAccountNumber = accountRepository
-                    .findByAccountNumberContainingIgnoreCaseAndUserAndIdNotIn(keyword, loggedInUser, ids);
+                    .findByAccountNumberContainingIgnoreCaseAndUserAndIdNotInAndDeleteIsFalse(keyword, loggedInUser, ids);
 
             accounts = Stream
                     .concat(accountsResultByName.stream(), accountsResultByAccountNumber.stream())
@@ -102,8 +102,8 @@ public class AccountServiceImpl implements AccountService {
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
 
-        if (accountRepository.existsByUserAndNameOrUserAndAccountNumber(user, accountRequest.getName(), user, accountRequest.getAccountNumber())){
-            throw new ApiException(HttpStatus.BAD_REQUEST, "There is a account with the same name/ account number");
+        if (accountRepository.existsByUserAndNameAndDeleteIsFalseOrUserAndAccountNumberAndDeleteIsFalse(user, accountRequest.getName(), user, accountRequest.getAccountNumber())){
+            throw new ApiException(HttpStatus.BAD_REQUEST, "There is a account with the same name / account number");
         }
 
         Account account = accountRepository.save(
@@ -112,6 +112,7 @@ public class AccountServiceImpl implements AccountService {
                         .accountNumber(accountRequest.getAccountNumber())
                         .ewallet(ewallet)
                         .user(user)
+                        .delete(false)
                         .build()
         );
 
@@ -152,7 +153,7 @@ public class AccountServiceImpl implements AccountService {
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
 
-        if (accountRepository.existsByUserAndNameAndIdNotOrUserAndAccountNumberAndIdNot(user, accountRequest.getName(), id, user, accountRequest.getAccountNumber(), id)){
+        if (accountRepository.existsByUserAndNameAndIdNotAndDeleteIsFalseOrUserAndAccountNumberAndIdNotAndDeleteIsFalse(user, accountRequest.getName(), id, user, accountRequest.getAccountNumber(), id)){
             throw new ApiException(HttpStatus.BAD_REQUEST, "There is a account with the same name / account number");
         }
 
@@ -178,7 +179,8 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountRepository.findById(id)
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "Account tidak ditemukan"));
 
-        accountRepository.delete(account);
+        account.setDelete(true);
+        accountRepository.save(account);
         return true;
     }
 }
