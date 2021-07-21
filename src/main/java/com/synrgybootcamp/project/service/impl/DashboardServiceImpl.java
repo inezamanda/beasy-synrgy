@@ -146,7 +146,7 @@ public class DashboardServiceImpl implements DashboardService {
   }
 
   private SubRecentTransactionResponse generateMostRecenTransactionData(User loggedInUser) {
-    return transactionRepository.findFirstByUser(loggedInUser).map(data -> SubRecentTransactionResponse.builder()
+    return transactionRepository.findFirstByUserOrderByDateDesc(loggedInUser).map(data -> SubRecentTransactionResponse.builder()
         .name(data.getType().getTextDisplay())
         .logo(ImageUtil.getImageFromTransactionType(data.getType()))
         .date(data.getDate())
