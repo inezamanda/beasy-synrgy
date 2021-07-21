@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
@@ -21,5 +22,6 @@ public class PocketRequest {
 
     Integer target;
 
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     Date dueDate;
 }
