@@ -64,7 +64,7 @@ public class PocketServiceImpl implements PocketService {
         User user = userRepository.findById(userInformation.getUserID())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user yang dipilih tidak ditemukan"));
 
-        String uploadFile = "https://image.flaticon.com/icons/png/512/3453/3453422.png";
+        String uploadFile = "https://res.cloudinary.com/dh9nmeyfy/image/upload/v1626879602/dogePocket_yzcxxv.png";
         if (Objects.nonNull(pocketRequest.getPicture())) {
              uploadFile = uploadFileUtil.upload(pocketRequest.getPicture());
 
