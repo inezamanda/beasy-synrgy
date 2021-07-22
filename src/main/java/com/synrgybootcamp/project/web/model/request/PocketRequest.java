@@ -22,6 +22,5 @@ public class PocketRequest {
 
     Integer target;
 
-    @DateTimeFormat(pattern = "dd/MM/yyyy")
     Date dueDate;
 }
