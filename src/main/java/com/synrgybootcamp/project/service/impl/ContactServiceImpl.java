@@ -4,7 +4,6 @@ import com.synrgybootcamp.project.constant.TransactionConstants;
 import com.synrgybootcamp.project.entity.*;
 import com.synrgybootcamp.project.enums.RewardPlanetType;
 import com.synrgybootcamp.project.enums.TransactionType;
-import com.synrgybootcamp.project.helper.ContactHelper;
 import com.synrgybootcamp.project.repository.*;
 import com.synrgybootcamp.project.security.utility.UserInformation;
 import com.synrgybootcamp.project.service.ContactService;
@@ -12,12 +11,10 @@ import com.synrgybootcamp.project.util.ApiException;
 import com.synrgybootcamp.project.web.model.request.ContactRequest;
 import com.synrgybootcamp.project.web.model.response.ContactResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -70,20 +67,7 @@ public class ContactServiceImpl implements ContactService {
                     .collect(Collectors.toList());
         }
 
-        UserReward reward = getReward();
-
-        return contacts
-                .stream()
-                .map(contact -> ContactResponse
-                        .builder()
-                        .id(contact.getId())
-                        .name(contact.getName())
-                        .accountNumber(contact.getAccountNumber())
-                        .bankId(contact.getBank().getId())
-                        .bankName(contact.getBank().getName())
-                        .cost(!contact.getBank().getPrimary() ? (Objects.nonNull(reward) ? 0 : TransactionConstants.DIFFERENT_BANK_FEE) : 0)
-                        .build()
-                ).collect(Collectors.toList());
+        return toListResponse(contacts);
     }
 
     @Override
@@ -94,9 +78,9 @@ public class ContactServiceImpl implements ContactService {
 
         return Optional.ofNullable(transactionRepository
                 .findByUserAndTypeOrderByDateDesc(loggedInUser, TransactionType.TRANSFER))
-                .map(ContactHelper::getFromTransaction)
-                .map(ContactHelper::fetchRecentContact)
-                .map(ContactHelper::toWebResponse)
+                .map(this::getFromTransaction)
+                .map(this::fetchRecentContact)
+                .map(this::toListResponse)
                 .orElse(new ArrayList<>());
     }
 
@@ -211,5 +195,43 @@ public class ContactServiceImpl implements ContactService {
             .filter(userReward -> userReward.getTotalUsed() < userReward.getRewardPlanet().getAmount())
             .findFirst()
             .orElse(null);
+    }
+
+    private List<Contact> fetchRecentContact(List<Contact> contacts) {
+        List<Contact> recentContacts = new ArrayList<>();
+
+        contacts.stream().forEach(contact -> {
+            if (recentContacts.size() < 3) {
+                if (!CollectionUtils.contains(recentContacts.iterator(), contact)) {
+                    recentContacts.add(contact);
+                }
+            }
+        });
+
+        return recentContacts;
+    }
+
+    private List<ContactResponse> toListResponse(List<Contact> contacts) {
+        UserReward reward = getReward();
+
+        return contacts
+            .stream()
+            .map(contact -> ContactResponse
+                .builder()
+                .id(contact.getId())
+                .name(contact.getName())
+                .accountNumber(contact.getAccountNumber())
+                .bankId(contact.getBank().getId())
+                .bankName(contact.getBank().getName())
+                .cost(!contact.getBank().getPrimary() ? (Objects.nonNull(reward) ? 0 : TransactionConstants.DIFFERENT_BANK_FEE) : 0)
+                .build())
+            .collect(Collectors.toList());
+    }
+
+    private List<Contact> getFromTransaction(List<Transaction> transactions) {
+        return transactions.stream()
+            .filter(transaction -> transaction.getTransfer().getContact() != null)
+            .map(transaction -> transaction.getTransfer().getContact())
+            .collect(Collectors.toList());
     }
 }

@@ -67,18 +67,7 @@ public class AccountServiceImpl implements AccountService {
                     .collect(Collectors.toList());
         }
 
-        return accounts
-                .stream()
-                .map(account -> AccountResponse
-                        .builder()
-                        .id(account.getId())
-                        .name(account.getName())
-                        .accountNumber(account.getAccountNumber())
-                        .ewalletId(account.getEwallet().getId())
-                        .ewalletName(account.getEwallet().getName())
-                        .adminFee(TransactionConstants.ADMIN_FEE)
-                        .build()
-                ).collect(Collectors.toList());
+        return toWebResponse(accounts);
     }
 
     @Override
@@ -88,9 +77,9 @@ public class AccountServiceImpl implements AccountService {
 
         return Optional.ofNullable(transactionRepository
                 .findByUserAndTypeOrderByDateDesc(loggedInUser, TransactionType.EWALLET))
-                .map(AccountHelper::getFromTransaction)
-                .map(AccountHelper::fetchRecentAccount)
-                .map(AccountHelper::toWebResponse)
+                .map(this::getFromTransaction)
+                .map(this::fetchRecentAccount)
+                .map(this::toWebResponse)
                 .orElse(new ArrayList<>());
     }
 
@@ -180,5 +169,40 @@ public class AccountServiceImpl implements AccountService {
 
         accountRepository.delete(account);
         return true;
+    }
+
+    private List<Account> fetchRecentAccount(List<Account> accounts) {
+        List<Account> recentAccounts = new ArrayList<>();
+
+        accounts.stream().forEach(account -> {
+            if (recentAccounts.size() < 3) {
+                if (!CollectionUtils.contains(recentAccounts.iterator(), account)) {
+                    recentAccounts.add(account);
+                }
+            }
+        });
+
+        return recentAccounts;
+    }
+
+    private List<AccountResponse> toWebResponse(List<Account> accounts) {
+        return accounts.stream()
+            .map(account -> AccountResponse
+                .builder()
+                .id(account.getId())
+                .name(account.getName())
+                .accountNumber(account.getAccountNumber())
+                .ewalletId(account.getEwallet().getId())
+                .ewalletName(account.getEwallet().getName())
+                .adminFee(TransactionConstants.ADMIN_FEE)
+                .build()
+            ).collect(Collectors.toList());
+    }
+
+    private List<Account> getFromTransaction(List<Transaction> transactions) {
+        return transactions.stream()
+            .filter(transaction -> transaction.getEwalletTransaction().getAccount() != null)
+            .map(transaction -> transaction.getEwalletTransaction().getAccount())
+            .collect(Collectors.toList());
     }
 }
