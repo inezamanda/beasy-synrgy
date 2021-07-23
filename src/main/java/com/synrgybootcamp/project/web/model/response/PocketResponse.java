@@ -15,10 +15,6 @@ import java.util.Date;
 @AllArgsConstructor
 public class PocketResponse {
 
-    @JsonProperty("user_id")
-    String userId;
-
-    String id;
     String picture;
 
     @JsonProperty("pocket_name")
@@ -26,10 +22,9 @@ public class PocketResponse {
 
     Integer target;
     Integer balance;
-    boolean primary;
 
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss", timezone = "GMT+7")
+    @JsonFormat(pattern = "dd/MM/yyyy", timezone = "GMT+7")
     Date dueDate;
 
-    boolean delete;
+
 }
