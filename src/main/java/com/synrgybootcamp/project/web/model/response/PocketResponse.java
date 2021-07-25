@@ -26,10 +26,9 @@ public class PocketResponse {
 
     Integer target;
     Integer balance;
-    boolean primary;
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss", timezone = "GMT+7")
     Date dueDate;
 
-    boolean delete;
+
 }

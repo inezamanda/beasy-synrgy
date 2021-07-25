@@ -93,7 +93,6 @@ public class PocketServiceImpl implements PocketService {
                 .target(pocket.getTarget())
                 .balance(0)
                 .dueDate(pocket.getDueDate())
-                .delete(false)
                 .build();
 
 
@@ -121,11 +120,9 @@ public class PocketServiceImpl implements PocketService {
                 .userId(pocketResult.getUser().getId())
                 .picture(pocketResult.getPicture())
                 .pocketName(pocketResult.getName())
-                .primary(pocketResult.getPrimary())
                 .target(pocketResult.getTarget())
                 .balance(pocketResult.getBalance())
                 .dueDate(pocketResult.getDueDate())
-                .delete(pocketResult.getDelete())
                 .build();
     }
 
@@ -147,7 +144,6 @@ public class PocketServiceImpl implements PocketService {
                             .userId(p.getUser().getId())
                             .picture(p.getPicture())
                             .pocketName(p.getName())
-                            .primary(p.getPrimary())
                             .target(Objects.nonNull(p.getTarget()) ? p.getTarget() : 0)
                             .balance(p.getBalance())
                             .dueDate(p.getDueDate())
@@ -167,9 +163,7 @@ public class PocketServiceImpl implements PocketService {
                 .userId(pocket.getUser().getId())
                 .picture(pocket.getPicture())
                 .pocketName(pocket.getName())
-                .primary(pocket.getPrimary())
                 .target(pocket.getTarget())
-                .balance(pocket.getBalance())
                 .dueDate(pocket.getDueDate())
                 .build();
     }
