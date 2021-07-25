@@ -86,6 +86,8 @@ public class PocketServiceImpl implements PocketService {
         missionHelper.checkAndValidatePocketCreationMission(pocket);
 
         return PocketResponse.builder()
+                .id(pocket.getId())
+                .userId(userInformation.getUserID())
                 .pocketName(pocket.getName())
                 .picture(uploadFile)
                 .target(pocket.getTarget())
@@ -114,6 +116,8 @@ public class PocketServiceImpl implements PocketService {
 
         return PocketResponse
                 .builder()
+                .id(pocketResult.getId())
+                .userId(pocketResult.getUser().getId())
                 .picture(pocketResult.getPicture())
                 .pocketName(pocketResult.getName())
                 .target(pocketResult.getTarget())
@@ -136,6 +140,8 @@ public class PocketServiceImpl implements PocketService {
             return pockets.stream()
                     .map(p -> PocketResponse
                             .builder()
+                            .id(p.getId())
+                            .userId(p.getUser().getId())
                             .picture(p.getPicture())
                             .pocketName(p.getName())
                             .target(Objects.nonNull(p.getTarget()) ? p.getTarget() : 0)
@@ -153,6 +159,8 @@ public class PocketServiceImpl implements PocketService {
 
         return PocketResponse
                 .builder()
+                .id(pocket.getId())
+                .userId(pocket.getUser().getId())
                 .picture(pocket.getPicture())
                 .pocketName(pocket.getName())
                 .target(pocket.getTarget())

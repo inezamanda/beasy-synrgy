@@ -15,6 +15,10 @@ import java.util.Date;
 @AllArgsConstructor
 public class PocketResponse {
 
+    @JsonProperty("user_id")
+    String userId;
+
+    String id;
     String picture;
 
     @JsonProperty("pocket_name")
