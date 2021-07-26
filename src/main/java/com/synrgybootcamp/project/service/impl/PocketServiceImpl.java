@@ -163,6 +163,7 @@ public class PocketServiceImpl implements PocketService {
                 .userId(pocket.getUser().getId())
                 .picture(pocket.getPicture())
                 .pocketName(pocket.getName())
+                .balance(pocket.getBalance())
                 .target(pocket.getTarget())
                 .dueDate(pocket.getDueDate())
                 .build();
