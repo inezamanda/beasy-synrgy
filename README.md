@@ -1,7 +1,11 @@
 ## Beasy REST API
 Beasy is dummy banking app with gamification.
 
-Swagger Api Documentation : [SWAGGER](https://beasy-api-dev.herokuapp.com/swagger-ui.html)
+API Base URL : [https://api.beasyapp.tech/](https://api.beasyapp.tech)
+
+Swagger API Documentation : [SWAGGER](https://beasyapp.tech/swagger-ui.html)
+
+Database Schema : [DBDIAGRAM](https://dbdiagram.io/d/60f710694ed9be1c05d4fdac)
 
 ## Technology Stack
 - Java
